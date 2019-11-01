@@ -105,8 +105,8 @@ void *ThreadBehavior(void *t_data)
             printf("Uzytkownik sie rozlaczyl!\n");
             for(int i=0;i<DESCRIPTION_ARRAY_SIZE;i++)
                 {
-                    if(t_data->descriptor_array[i]==t_data->connection_socket_descriptor){
-                        t_data->descriptor_array[i]=-1;
+                    if(th_data->descriptor_array[i]==th_data->connection_socket_descriptor){
+                        th_data->descriptor_array[i]=-1;
                         break;
                     }
                 }
