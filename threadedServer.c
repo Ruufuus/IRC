@@ -58,18 +58,12 @@ char * bezpieczne_odczytywanie(struct thread_data_t * t_data,int * czy_polaczony
         read_result=read(t_data->connection_socket_descriptor,temp,1);
         if(read_result<0)
         {
+            czy_polaczony=0;
             printf("Nastapil blad przy odczycie!\n");
             break;
         }
         else if(read_result==0){
-            printf("Uzytkownik sie rozlaczyl!\n");
-            for(int i=0;i<DESCRIPTION_ARRAY_SIZE;i++)
-                {
-                    if(t_data->descriptor_array[i]==t_data->connection_socket_descriptor)
-                        t_data->descriptor_array[i]=-1;
-                        break;
-                }
-                czy_polaczony=0;
+            czy_polaczony=0;
             break;
         }
         strcat(buffor,temp);
@@ -96,15 +90,25 @@ void *ThreadBehavior(void *t_data)
         if(wykrywanie_komendy(buffor,"$leave"))
         {
             czy_polaczony=0;
-            printf("Uzytkownik podlaczony do socketu %d sie rozlaczyl!\n",th_data->connection_socket_descriptor);
         }
-        else
+        if(czy_polaczony)
         {
             printf("Serwer otrzymal wiadomosc o tresci: %s\n",buffor);
             for(int i=0;i<DESCRIPTION_ARRAY_SIZE;i++)
                 {
                 if(th_data->descriptor_array[i]!=th_data->connection_socket_descriptor && th_data->descriptor_array[i]!=-1)
                 bezpieczne_wysylanie(th_data,buffor);
+                }
+        }
+        else
+        {
+            printf("Uzytkownik sie rozlaczyl!\n");
+            for(int i=0;i<DESCRIPTION_ARRAY_SIZE;i++)
+                {
+                    if(t_data->descriptor_array[i]==t_data->connection_socket_descriptor){
+                        t_data->descriptor_array[i]=-1;
+                        break;
+                    }
                 }
         }
         free(buffor);
