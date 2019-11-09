@@ -3,6 +3,7 @@
 #define BUFF_SIZE 1024
 #define DESCRIPTION_ARRAY_SIZE 100
 #define COMMAND_ARRAY_SIZE 3
+#define MAX_USERS_CONNECTED_TO_CHANNEL 20
 
 #include <sys/types.h>
 #include <sys/wait.h>
