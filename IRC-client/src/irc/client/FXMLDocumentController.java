@@ -36,7 +36,7 @@ public class FXMLDocumentController {
 
     @FXML
     private TextFlow textFlow;
-    
+
     @FXML
     private MenuItem polaczSubMenu;
 
@@ -50,8 +50,8 @@ public class FXMLDocumentController {
     void sendMessage(ActionEvent event) {
         messField.clear();
     }
-    
-     @FXML
+
+    @FXML
     private TextField adresTextField;
 
     @FXML
@@ -72,9 +72,9 @@ public class FXMLDocumentController {
     void okConnectionButtonAction(ActionEvent event) {
 
     }
-    
+
     @FXML
-    void polaczAction(ActionEvent event){
+    void polaczAction(ActionEvent event) {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("ConnectionWindow.fxml"));
             Parent root = fxmlLoader.load();
@@ -88,13 +88,46 @@ public class FXMLDocumentController {
     }
 
     @FXML
-    void initialize() {
-        assert messField != null : "fx:id=\"messField\" was not injected: check your FXML file 'FXMLDocument.fxml'.";
-        assert textFlow != null : "fx:id=\"textFlow\" was not injected: check your FXML file 'FXMLDocument.fxml'.";
-        assert polaczSubMenu != null : "fx:id=\"polaczSubMenu\" was not injected: check your FXML file 'FXMLDocument.fxml'.";
-        assert canalList != null : "fx:id=\"canalList\" was not injected: check your FXML file 'FXMLDocument.fxml'.";
-        assert userList != null : "fx:id=\"userList\" was not injected: check your FXML file 'FXMLDocument.fxml'.";
+    void kanalAction(ActionEvent event) {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("CanalWindow.fxml"));
+            Parent root = fxmlLoader.load();
+            Stage stage = new Stage();
+            stage.setTitle("Zarządzanie Kanałami");
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (IOException ex) {
+            Logger.getLogger(FXMLDocumentController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    @FXML
+    private Button okCanalButton;
 
+    @FXML
+    private Button anulujCanalButton;
+
+    @FXML
+    private TextField textFieldCanal;
+
+    @FXML
+    void anulujCanalButtonAction(ActionEvent event) {
+
+    }
+
+    @FXML
+    void okCanalButtonAction(ActionEvent event) {
+
+    }
+
+    @FXML
+    void textFieldCanalAction(ActionEvent event) {
+
+    }
+
+
+    @FXML
+    void initialize() {
 
     }
 }
