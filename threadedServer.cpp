@@ -1,6 +1,5 @@
 #include "const.h"
 #include "message_handling.h"
-#include "thread_data_t.h"
 //funkcja opisującą zachowanie wątku - musi przyjmować argument typu (void *) i zwracać (void *)
 void *ThreadBehavior(void *t_data)
 {
@@ -10,32 +9,28 @@ void *ThreadBehavior(void *t_data)
     char * buffor;
     while(connected)
     {
-        buffor=reading_message(th_data,&connected);
+        buffor=reading_message(th_data->connection_socket_descriptor,&connected);
         int command_number = command_detection(buffor,th_data->command);
         if(command_number==0){
             printf("Uzytkownik podlaczony do socketu %d rozlaczyl sie!\n",th_data->connection_socket_descriptor);
             connected=false;
         }
+        room temp=th_data->room_list[th_data->room_index];
         if(connected)
         {
             printf("Serwer otrzymal message o tresci: %s\n",buffor);
-            for(int i=0;i<DESCRIPTION_ARRAY_SIZE;i++)
+            for(int i=0;i<MAX_USERS_CONNECTED_TO_CHANNEL;i++)
                 {
-                if(th_data->descriptor_array[i]!=th_data->connection_socket_descriptor && th_data->descriptor_array[i]!=-1)
-                sending_message(th_data,buffor);
+                    if(temp.get_user_sd(i)!=-1 && temp.get_user_sd(i)!=th_data->connection_socket_descriptor){
+                        sending_message(temp.get_user_sd(i),buffor);
+                    }
                 }
         }
         else
         {
             printf("Uzytkownik sie rozlaczyl!\n");
             close(th_data->connection_socket_descriptor);
-            for(int i=0;i<DESCRIPTION_ARRAY_SIZE;i++)
-                {
-                    if(th_data->descriptor_array[i]==th_data->connection_socket_descriptor){
-                        th_data->descriptor_array[i]=-1;
-                        break;
-                    }
-                }
+            temp.remove_user(th_data->connection_socket_descriptor);
         }
         delete buffor;
     }
@@ -44,16 +39,19 @@ void *ThreadBehavior(void *t_data)
 }
 
 //funkcja obsługująca połączenie z nowym klientem
-void handleConnection(int connection_socket_descriptor,int * descriptor_array,char ** command) {
+void handleConnection(int connection_socket_descriptor,char ** command,std::vector<room> room_list) {
     //wynik funkcji tworzącej wątek
     int create_result = 0;
 
     //uchwyt na wątek
     pthread_t thread1;
     thread_data_t* t_data=new thread_data_t;
-    t_data->descriptor_array=descriptor_array;
+    user new_user(connection_socket_descriptor);
+    room_list[0].add_user(new_user);
     t_data->connection_socket_descriptor=connection_socket_descriptor; 
     t_data->command=command;
+    t_data->room_list=room_list;
+    t_data->room_index=0;
     create_result = pthread_create(&thread1, NULL, ThreadBehavior, (void *)t_data);
     if (create_result){
     printf("Błąd przy próbie utworzenia wątku, kod błędu: %d\n", create_result);
@@ -63,8 +61,12 @@ void handleConnection(int connection_socket_descriptor,int * descriptor_array,ch
 
 int main(int argc, char* argv[])
 {
-    //int * descriptor_array = malloc(sizeof(int)*DESCRIPTION_ARRAY_SIZE);
-   int * descriptor_array = new int [DESCRIPTION_ARRAY_SIZE];
+    printf("XDD\n");
+    std::vector<room> room_list;
+    printf("XDD\n");
+    room pokoj("default_room");
+    printf("XDD\n");
+   room_list.push_back(pokoj);  
    char ** command = new char * [COMMAND_ARRAY_SIZE];
     for (int i = 0; i<COMMAND_ARRAY_SIZE;i++)
         {
@@ -81,7 +83,6 @@ int main(int argc, char* argv[])
    struct sockaddr_in server_address;
 
    //inicjalizacja gniazda serwera
-   memset(descriptor_array, -1, sizeof(int)*DESCRIPTION_ARRAY_SIZE);
    memset(&server_address, 0, sizeof(struct sockaddr));
    server_address.sin_family = AF_INET;
    server_address.sin_addr.s_addr = htonl(INADDR_ANY);
@@ -117,20 +118,12 @@ int main(int argc, char* argv[])
            fprintf(stderr, "%s: Błąd przy próbie utworzenia gniazda dla połączenia.\n", argv[0]);
            exit(1);
        }
-       for (int i=0;i<DESCRIPTION_ARRAY_SIZE;i++)
-       {
-           if(descriptor_array[i]==-1)
-           {
-                descriptor_array[i]=connection_socket_descriptor;
-                break;
-            }
-       }
-       handleConnection(connection_socket_descriptor,descriptor_array,command);
+
+       handleConnection(connection_socket_descriptor,command,room_list);
    }
    for (int i = 0; i<COMMAND_ARRAY_SIZE;i++)
         delete command[i];
    delete []command;
-   delete descriptor_array;
    close(server_socket_descriptor);
    return(0);
 }

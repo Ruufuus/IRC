@@ -1,7 +1,6 @@
-#ifndef Room_H
-#define Room_H
-#include "const.h"
-
+#ifndef ROOM_H
+#define ROOM_H
+#include "user.h"
 class room{
     private:
         char * room_name;
@@ -11,7 +10,10 @@ class room{
         void remove_user(int socket_descriptor);
         void add_user(user user);
         void show_users(int socket_descriptor);
-        room(char * room_name,user user);
+        int get_user_sd(int index);
+        room();
+        room(char * room_name);
+        ~room();
 };
 
 #endif

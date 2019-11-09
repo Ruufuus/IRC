@@ -1,4 +1,5 @@
-void sending_message(struct thread_data_t * t_data, char * tresc){
+#include "message_handling.h"
+void sending_message(int connection_socket_descriptor, char * tresc){
     /*
     *funkcja w petli wysyla kolejne fragmenty tresci wiadmosci,
     az nie wysle sumarycznie tyle bajtow, co ma tresc messagei.
@@ -11,14 +12,14 @@ void sending_message(struct thread_data_t * t_data, char * tresc){
     do{
         temp = new char[message_length-write_result];
         strncpy(temp,tresc+write_result,message_length-write_result);
-        write_result+=write(t_data->connection_socket_descriptor,temp,strlen(temp));
+        write_result+=write(connection_socket_descriptor,temp,strlen(temp));
         delete temp;
     }while(write_result!=message_length);
 
 }
 
 
-char * reading_message(struct thread_data_t * t_data,bool * connected){
+char * reading_message(int connection_socket_descriptor,bool * connected){
     /*
     Funkcja ta w kolejnych iteracjach petli while,
     odczytuje po jednym znaku, az nie natrafi na znak nowej linii
@@ -28,7 +29,7 @@ char * reading_message(struct thread_data_t * t_data,bool * connected){
     char * temp = new char;
     int read_result;
     do{
-        read_result=read(t_data->connection_socket_descriptor,temp,1);
+        read_result=read(connection_socket_descriptor,temp,1);
         if(read_result<0)
         {
             printf("Nastapil blad przy odczycie!\n");

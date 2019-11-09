@@ -1,48 +1,52 @@
-#include "room.h"
-class room{
-    void set_room_name(char* room_name);
+    #include "room.h"
+
+    void room::set_room_name(char* room_name)
     {
-        this.room_name=room_name;
+        this->room_name=room_name;
     }
-    void remove_user(int socket_descriptor){
-        for (int i=0;i<sizeof(this.user_list)/sizeof(user);i++){
-            if(this.user_list[i] && this.user_list[i].socket_descriptor_id()==socket_descriptor)
+    void room::remove_user(int socket_descriptor){
+        for (int i=0;i<MAX_ROOMS;i++){
+            if(this->user_list[i].get_socket_description_id()==socket_descriptor)
                 {
-                    this.user_list[i]=NULL;
+                    this->user_list[i].set_socket_description(-1);
                 }
         }
     }
-    void add_user(user user)
-    {
-        for (int i=0;i<sizeof(this.user_list)/sizeof(user);i++){
-            if(!this.user_list[i])
+    void room::add_user(user user){
+        for (int i=0;i<MAX_ROOMS;i++){
+            if(this->user_list[i].get_socket_description_id()==-1)
                 {
-                    this.user_list[i]=user;
+                    this->user_list[i]=user;
                 }
         }
     }
-    void show_users(int socket_descriptor){
-       char * buffor 
-       for (int i=0;i<sizeof(this.user_list)/sizeof(user);i++){
-            if(this.user_list[i])
+    void room::show_users(int socket_descriptor){
+       char * buffor; 
+       for (int i=0;i<MAX_ROOMS;i++){
+            if(this->user_list[i].get_socket_description_id()!=-1)
                 {
                     buffor = new char [BUFF_SIZE];
-                    strcpy(buffor,this.user_list[i].get_name());
+                    strcpy(buffor,this->user_list[i].get_username());
                     strcat(buffor,"@");
-                    strcat(buffor,this.user_list[i].get_color());
+                    strcat(buffor,this->user_list[i].get_color());
                     write(socket_descriptor,buffor,strlen(buffor));
                     delete(buffor);
 
                 }
         } 
     }
-    room(char * room_name,user user);
-    {
-        this.room_name=room_name;
-        this.user_list = new user [MAX_USERS_CONNECTED_TO_CHANNEL];
-        for (int i=0;i<sizeof(this.user_list)/sizeof(user);i++){
-            this.user_list[i]=NULL;
-        }
-        add_user(user);
+    int room::get_user_sd(int index){
+        return this->user_list[index].get_socket_description_id();
     }
-}
+    room::room(char * room_name){
+        this->room_name=room_name;
+        this->user_list = new user [MAX_USERS_CONNECTED_TO_CHANNEL];
+    }
+    room::room(){
+        strcpy(this->room_name,"default_name");
+        this->user_list = new user [MAX_USERS_CONNECTED_TO_CHANNEL];
+    };
+    room::~room()
+    {
+        delete [] this->user_list;
+    }
