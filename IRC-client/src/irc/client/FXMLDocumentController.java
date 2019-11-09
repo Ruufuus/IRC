@@ -9,27 +9,41 @@ import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
-import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.control.TextField;
+import javafx.scene.text.TextFlow;
 
-/**
- *
- * @author Robert Ciemny
- */
-public class FXMLDocumentController implements Initializable {
-    
+public class FXMLDocumentController {
+
     @FXML
-    private Label label;
-    
+    private ResourceBundle resources;
+
     @FXML
-    private void handleButtonAction(ActionEvent event) {
-        System.out.println("You clicked me!");
-        label.setText("Hello World!");
+    private URL location;
+
+    @FXML
+    private TextField messField;
+
+    @FXML
+    private TextFlow textFlow;
+
+    @FXML
+    private ListView<?> canalList;
+
+    @FXML
+    private ListView<?> userList;
+
+    @FXML
+    void sendMessage(ActionEvent event) {
+        messField.clear();
     }
-    
-    @Override
-    public void initialize(URL url, ResourceBundle rb) {
-        // TODO
-    }    
-    
+
+    @FXML
+    void initialize() {
+        assert messField != null : "fx:id=\"messField\" was not injected: check your FXML file 'FXMLDocument.fxml'.";
+        assert textFlow != null : "fx:id=\"textFlow\" was not injected: check your FXML file 'FXMLDocument.fxml'.";
+        assert canalList != null : "fx:id=\"canalList\" was not injected: check your FXML file 'FXMLDocument.fxml'.";
+        assert userList != null : "fx:id=\"userList\" was not injected: check your FXML file 'FXMLDocument.fxml'.";
+
+    }
 }
