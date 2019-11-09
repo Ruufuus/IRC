@@ -23,6 +23,7 @@ public class IRCClient extends Application {
         
         Scene scene = new Scene(root);
         
+        stage.setTitle("IRC H4XXXOR CLIENT");
         stage.setScene(scene);
         stage.show();
     }

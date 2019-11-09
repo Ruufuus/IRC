@@ -17,6 +17,8 @@ import java.util.logging.Logger;
  */
 public class Connection implements Runnable{
     Socket clientSocket = null;
+    Reader reader = null;
+    Writer writer = null;
     
     
     

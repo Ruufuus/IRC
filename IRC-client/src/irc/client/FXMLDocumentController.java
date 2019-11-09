@@ -5,13 +5,23 @@
  */
 package irc.client;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.text.TextFlow;
+import javafx.scene.control.Button;
+import javafx.scene.control.MenuItem;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 public class FXMLDocumentController {
 
@@ -26,6 +36,9 @@ public class FXMLDocumentController {
 
     @FXML
     private TextFlow textFlow;
+    
+    @FXML
+    private MenuItem polaczSubMenu;
 
     @FXML
     private ListView<?> canalList;
@@ -37,13 +50,51 @@ public class FXMLDocumentController {
     void sendMessage(ActionEvent event) {
         messField.clear();
     }
+    
+     @FXML
+    private TextField adresTextField;
+
+    @FXML
+    private TextField portTextField;
+
+    @FXML
+    private Button okConnectionButton;
+
+    @FXML
+    private Button anulujConnectionButton;
+
+    @FXML
+    void anulujConnectionButtonAction(ActionEvent event) {
+
+    }
+
+    @FXML
+    void okConnectionButtonAction(ActionEvent event) {
+
+    }
+    
+    @FXML
+    void polaczAction(ActionEvent event){
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("ConnectionWindow.fxml"));
+            Parent root = fxmlLoader.load();
+            Stage stage = new Stage();
+            stage.setTitle("Połącz");
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (IOException ex) {
+            Logger.getLogger(FXMLDocumentController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 
     @FXML
     void initialize() {
         assert messField != null : "fx:id=\"messField\" was not injected: check your FXML file 'FXMLDocument.fxml'.";
         assert textFlow != null : "fx:id=\"textFlow\" was not injected: check your FXML file 'FXMLDocument.fxml'.";
+        assert polaczSubMenu != null : "fx:id=\"polaczSubMenu\" was not injected: check your FXML file 'FXMLDocument.fxml'.";
         assert canalList != null : "fx:id=\"canalList\" was not injected: check your FXML file 'FXMLDocument.fxml'.";
         assert userList != null : "fx:id=\"userList\" was not injected: check your FXML file 'FXMLDocument.fxml'.";
+
 
     }
 }
