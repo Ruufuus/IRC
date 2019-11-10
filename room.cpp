@@ -46,7 +46,8 @@
                     strcpy(buffor,this->user_list[i].get_username().c_str());
                     strcat(buffor,"@");
                     strcat(buffor,this->user_list[i].get_color().c_str());
-                    write(socket_descriptor,buffor,strlen(buffor));
+                    strcat(buffor," ");
+                    sending_message(socket_descriptor,buffor);
                     delete(buffor);
 
                 }

@@ -2,6 +2,7 @@
 #define ROOM_H
 #include "const.h"
 #include "user.h"
+#include "message_handling.h"
 class room{
     private:
         std::string room_name;
