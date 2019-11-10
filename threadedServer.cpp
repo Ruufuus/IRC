@@ -20,7 +20,12 @@ void *ThreadBehavior(void *t_data)
         int command_number = command_detection(buffor,th_data->command);
         if(command_number==0){
             printf("Uzytkownik podlaczony do socketu %d rozlaczyl sie!\n",th_data->connection_socket_descriptor);
+            char* buff = new char[30];
+            strcpy(buff,"connection ended\n");
+            sending_message(th_data->connection_socket_descriptor,buff);
             connected=false;
+            delete buff;
+            th_data->room_list[th_data->room_index].remove_user(th_data->connection_socket_descriptor);
         }
         else if(command_number==1){
             bool czy_dolaczono=false;
@@ -55,10 +60,16 @@ void *ThreadBehavior(void *t_data)
             }
         }
         else if(command_number==2){
-                th_data->room_list[th_data->room_index].get_user(th_data->connection_socket_descriptor).set_username(std::string(buffor));
+                user new_user = th_data->room_list[th_data->room_index].get_user(th_data->connection_socket_descriptor);
+                new_user.set_username(buffor);
+                th_data->room_list[th_data->room_index].remove_user(th_data->connection_socket_descriptor);
+                th_data->room_list[th_data->room_index].add_user(new_user);
             }
         else if(command_number==3){
-                th_data->room_list[th_data->room_index].get_user(th_data->connection_socket_descriptor).set_color(std::string(buffor));
+                user new_user = th_data->room_list[th_data->room_index].get_user(th_data->connection_socket_descriptor);
+                new_user.set_username(buffor);
+                th_data->room_list[th_data->room_index].remove_user(th_data->connection_socket_descriptor);
+                th_data->room_list[th_data->room_index].add_user(new_user);
         }
         else if(command_number==4){
             char * buff = new char [BUFF_SIZE];
@@ -90,12 +101,11 @@ void *ThreadBehavior(void *t_data)
         else
         {
             printf("Uzytkownik sie rozlaczyl!\n");
-            close(th_data->connection_socket_descriptor);
             th_data->room_list[th_data->room_index].remove_user(th_data->connection_socket_descriptor);
         }
-        memset(buffor,'\0',sizeof(char)*BUFF_SIZE);
         delete buffor;
     }
+    close(th_data->connection_socket_descriptor);
     delete th_data;
     pthread_exit(NULL);
 }
