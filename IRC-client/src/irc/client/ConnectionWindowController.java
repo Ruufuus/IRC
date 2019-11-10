@@ -10,6 +10,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.stage.Stage;
 
 public class ConnectionWindowController {
 
@@ -33,11 +34,16 @@ public class ConnectionWindowController {
 
     @FXML
     void anulujConnectionButtonAction(ActionEvent event) {
+        
 
     }
 
     @FXML
     void okConnectionButtonAction(ActionEvent event) {
+        FXMLDocumentController.connection = new Connection(this.adresTextField.getText(), Integer.parseInt(this.portTextField.getText()));
+        new Thread(FXMLDocumentController.connection).start();
+        Stage stage = (Stage) this.okConnectionButton.getScene().getWindow();
+        stage.close();
 
     }
 

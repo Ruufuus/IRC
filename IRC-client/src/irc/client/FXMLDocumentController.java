@@ -22,6 +22,8 @@ import javafx.stage.Stage;
  
 
 public class FXMLDocumentController {
+    
+    static Connection connection = null;
 
     @FXML // ResourceBundle that was given to the FXMLLoader
     private ResourceBundle resources;
@@ -70,7 +72,10 @@ public class FXMLDocumentController {
     }
 
     @FXML
-    void sendMessage(ActionEvent event) {
+    void sendMessage(ActionEvent event) throws IOException {
+        String message = this.messField.getText();
+        this.connection.sendMessage(message);
+        messField.clear();
 
     }
 
