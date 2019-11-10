@@ -22,14 +22,13 @@ void *ThreadBehavior(void *t_data)
             printf("Uzytkownik podlaczony do socketu %d rozlaczyl sie!\n",th_data->connection_socket_descriptor);
             connected=false;
         }
-        room temp=th_data->room_list[th_data->room_index];
         if(connected)
         {
             printf("Serwer otrzymal message o tresci: %s\n",buffor);
             for(int i=0;i<MAX_USERS_CONNECTED_TO_CHANNEL;i++)
                 {
-                    if(temp.get_user_sd(i)!=-1 && temp.get_user_sd(i)!=th_data->connection_socket_descriptor){
-                        sending_message(temp.get_user_sd(i),buffor);
+                    if(th_data->room_list[th_data->room_index].get_user_sd(i)!=-1 && th_data->room_list[th_data->room_index].get_user_sd(i)!=th_data->connection_socket_descriptor){
+                        sending_message(th_data->room_list[th_data->room_index].get_user_sd(i),buffor);
                     }
                 }
         }
@@ -37,7 +36,7 @@ void *ThreadBehavior(void *t_data)
         {
             printf("Uzytkownik sie rozlaczyl!\n");
             close(th_data->connection_socket_descriptor);
-            temp.remove_user(th_data->connection_socket_descriptor);
+            th_data->room_list[th_data->room_index].remove_user(th_data->connection_socket_descriptor);
         }
         delete buffor;
     }

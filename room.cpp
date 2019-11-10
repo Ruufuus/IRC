@@ -45,12 +45,12 @@
     };
     room::room(std::string room_name){
         this->room_name=room_name;
-        this->user_list = new user [MAX_USERS_CONNECTED_TO_CHANNEL];
+        this->user_list = new user[MAX_USERS_CONNECTED_TO_CHANNEL];
         this->room_alive=true;
     };
     room::room(){
         this->room_name="Default Room";
-        this->user_list = new user [MAX_USERS_CONNECTED_TO_CHANNEL];
+        this->user_list = new user[MAX_USERS_CONNECTED_TO_CHANNEL];
         this->room_alive=false;
     };
     std::string room::get_room_name()

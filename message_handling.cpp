@@ -7,7 +7,7 @@ void sending_message(int connection_socket_descriptor, char * tresc){
     tymczasowo coraz to mniejsza czesc tresci messagei
     */
     int write_result=0;
-    int message_length=sizeof(tresc);
+    int message_length=strlen(tresc);
     char * temp;
     do{
         temp = new char[message_length-write_result];
