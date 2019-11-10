@@ -12,6 +12,17 @@
                     break;
                 }
         }
+         for (int i=0;i<MAX_USERS_CONNECTED_TO_CHANNEL;i++){
+             this->room_alive=false;
+            if(this->user_list[i].get_socket_description_id()>0)
+                {
+                    this->room_alive=true;
+                    break;
+                }
+        }
+    };
+    bool room::get_if_alive(){
+        return this->room_alive;
     };
     user * room::get_user_list(){
         return this->user_list;
@@ -24,8 +35,9 @@
                     break;
                 }
         }
+        this->room_alive=true;
     };
-    void room::show_users(int socket_descriptor){
+    void room::send_user_list(int socket_descriptor){
        char * buffor; 
        for (int i=0;i<MAX_USERS_CONNECTED_TO_CHANNEL;i++){
             if(this->user_list[i].get_socket_description_id()!=-1)
@@ -47,6 +59,16 @@
         this->room_name=room_name;
         this->user_list = new user[MAX_USERS_CONNECTED_TO_CHANNEL];
         this->room_alive=true;
+    };
+    user room::get_user(int socket_descriptor){
+        for(int i=0;i<MAX_USERS_CONNECTED_TO_CHANNEL;i++){
+            if(this->user_list[i].get_socket_description_id()==socket_descriptor)
+            {
+                return this->user_list[i];
+            }
+        }
+        user empty_user;
+        return empty_user;
     };
     room::room(){
         this->room_name="Default Room";

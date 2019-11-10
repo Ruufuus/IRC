@@ -22,7 +22,39 @@ void *ThreadBehavior(void *t_data)
             printf("Uzytkownik podlaczony do socketu %d rozlaczyl sie!\n",th_data->connection_socket_descriptor);
             connected=false;
         }
-        if(connected)
+        else if(command_number==1){
+            bool czy_dolaczono=false;
+            for(int i=0;i<MAX_ROOMS;i++){
+                if(!strcmp(th_data->room_list[i].get_room_name().c_str(),buffor)){
+                    user temp_user = th_data->room_list[th_data->room_index].get_user(th_data->connection_socket_descriptor);
+                    th_data->room_list[th_data->room_index].remove_user(th_data->connection_socket_descriptor);
+                    th_data->room_index=i;
+                    th_data->room_list[i].add_user(temp_user);
+                    czy_dolaczono=true;
+                    printf("User polaczony na sockecie %d dolaczyl do kanalu %s\n",th_data->connection_socket_descriptor,buffor);
+                    break;
+                }
+            }
+            if(!czy_dolaczono){
+                bool czy_stworzono=false;
+                for(int i=0;i<MAX_ROOMS;i++){
+                    if(!th_data->room_list[i].get_if_alive()){
+                        user temp_user = th_data->room_list[th_data->room_index].get_user(th_data->connection_socket_descriptor);
+                        th_data->room_list[i].set_room_name(std::string(buffor));
+                        th_data->room_list[i].add_user(temp_user);
+                        th_data->room_list[th_data->room_index].remove_user(th_data->connection_socket_descriptor);
+                        th_data->room_index=i; 
+                        czy_stworzono=true;
+                        printf("User polaczony na sockecie %d stworzyl kanal %s\n",th_data->connection_socket_descriptor,buffor);
+                        break;
+                    }
+                }
+                if(!czy_stworzono){
+                    printf("User'owi polaczonemu na sockecie %d nie udalo sie dolaczyc do kanalu llub go stworzyc\n",th_data->connection_socket_descriptor);
+                }
+            }
+        }
+        else if(connected)
         {
             printf("Serwer otrzymal message o tresci: %s\n",buffor);
             for(int i=0;i<MAX_USERS_CONNECTED_TO_CHANNEL;i++)
