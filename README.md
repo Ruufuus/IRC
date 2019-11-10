@@ -18,3 +18,4 @@ $room_list
 $user_list
 $username
 $color
+$leave
