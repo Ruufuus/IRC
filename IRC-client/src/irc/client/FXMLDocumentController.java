@@ -20,11 +20,15 @@ import javafx.scene.control.TextField;
 import javafx.scene.text.TextFlow;
 import javafx.scene.control.Button;
 import javafx.scene.control.MenuItem;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 public class FXMLDocumentController {
+    
+    ///////////////////////////////////////
 
+    Connection connection = null;
+    
+    ///////////////////////////////////////
     @FXML
     private ResourceBundle resources;
 
@@ -70,7 +74,9 @@ public class FXMLDocumentController {
 
     @FXML
     void okConnectionButtonAction(ActionEvent event) {
-
+        this.connection = new Connection(this.adresTextField.getText(), Integer.parseInt(this.portTextField.getText()));
+        Stage stage = (Stage) this.okConnectionButton.getScene().getWindow();
+        stage.close();
     }
 
     @FXML
