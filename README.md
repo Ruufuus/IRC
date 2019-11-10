@@ -1,11 +1,12 @@
 # IRC
 Cele:
 -dodac synchronizacje
--dodac ochrone przed fragmentacja danych
--dodac obsluge wielu pokoi
 -dodac komentarze do kodu
--dodac obsluge Nickname'ow
 -poprawa czytelnosci kodu na samym koncu
+-dodac funkcje obslugujace zmiany pokoi
 Osiagniete cele:
 -podstawowy klient laczy sie z serwerem
 -podstawowi klienci sa w stanie rozmawiac w jednym pokoju miedzy soba
+-dodac obsluge Nickname'ow
+-dodac obsluge wielu pokoi
+-dodac ochrone przed fragmentacja danych
