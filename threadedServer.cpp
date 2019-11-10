@@ -1,5 +1,12 @@
 #include "const.h"
+#include "user.h"
+#include "room.h"
+#include "thread_data_t.h"
 #include "message_handling.h"
+#include <pthread.h>
+
+class room;
+class user;
 //funkcja opisującą zachowanie wątku - musi przyjmować argument typu (void *) i zwracać (void *)
 void *ThreadBehavior(void *t_data)
 {
@@ -39,7 +46,7 @@ void *ThreadBehavior(void *t_data)
 }
 
 //funkcja obsługująca połączenie z nowym klientem
-void handleConnection(int connection_socket_descriptor,char ** command,std::vector<room> room_list) {
+void handleConnection(int connection_socket_descriptor,char ** command,room * room_list) {
     //wynik funkcji tworzącej wątek
     int create_result = 0;
 
@@ -61,12 +68,7 @@ void handleConnection(int connection_socket_descriptor,char ** command,std::vect
 
 int main(int argc, char* argv[])
 {
-    printf("XDD\n");
-    std::vector<room> room_list;
-    printf("XDD\n");
-    room pokoj("default_room");
-    printf("XDD\n");
-   room_list.push_back(pokoj);  
+   room * room_list = new room[MAX_ROOMS];
    char ** command = new char * [COMMAND_ARRAY_SIZE];
     for (int i = 0; i<COMMAND_ARRAY_SIZE;i++)
         {
@@ -124,6 +126,7 @@ int main(int argc, char* argv[])
    for (int i = 0; i<COMMAND_ARRAY_SIZE;i++)
         delete command[i];
    delete []command;
+   delete []room_list;
    close(server_socket_descriptor);
    return(0);
 }

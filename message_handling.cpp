@@ -16,7 +16,7 @@ void sending_message(int connection_socket_descriptor, char * tresc){
         delete temp;
     }while(write_result!=message_length);
 
-}
+};
 
 
 char * reading_message(int connection_socket_descriptor,bool * connected){
@@ -43,7 +43,7 @@ char * reading_message(int connection_socket_descriptor,bool * connected){
     }while(strcmp(temp,"\n"));
     delete temp;
     return buffor;
-}
+};
 
 
 int command_detection(char * message, char ** command){
@@ -64,4 +64,4 @@ int command_detection(char * message, char ** command){
             }
     }
     return command_number;
-}
+};
