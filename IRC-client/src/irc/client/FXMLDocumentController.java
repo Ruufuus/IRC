@@ -1,10 +1,9 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * Sample Skeleton for 'FXMLDocument.fxml' Controller Class
  */
-package irc.client;
 
+package irc.client;
+ 
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -18,65 +17,42 @@ import javafx.scene.Scene;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.text.TextFlow;
-import javafx.scene.control.Button;
 import javafx.scene.control.MenuItem;
 import javafx.stage.Stage;
+ 
 
 public class FXMLDocumentController {
-    
-    ///////////////////////////////////////
 
-    Connection connection = null;
-    
-    ///////////////////////////////////////
-    @FXML
+    @FXML // ResourceBundle that was given to the FXMLLoader
     private ResourceBundle resources;
 
-    @FXML
+    @FXML // URL location of the FXML file that was given to the FXMLLoader
     private URL location;
 
-    @FXML
-    private TextField messField;
+    @FXML // fx:id="messField"
+    private TextField messField; // Value injected by FXMLLoader
+
+    @FXML // fx:id="textFlow"
+    private TextFlow textFlow; // Value injected by FXMLLoader
+
+    @FXML // fx:id="polaczSubMenu"
+    private MenuItem polaczSubMenu; // Value injected by FXMLLoader
+
+    @FXML // fx:id="dolaczSubMenu"
+    private MenuItem dolaczSubMenu; // Value injected by FXMLLoader
+
+    @FXML // fx:id="utworzSubMenu"
+    private MenuItem utworzSubMenu; // Value injected by FXMLLoader
+
+    @FXML // fx:id="canalList"
+    private ListView<?> canalList; // Value injected by FXMLLoader
+
+    @FXML // fx:id="userList"
+    private ListView<?> userList; // Value injected by FXMLLoader
 
     @FXML
-    private TextFlow textFlow;
+    void kanalAction(ActionEvent event) {
 
-    @FXML
-    private MenuItem polaczSubMenu;
-
-    @FXML
-    private ListView<?> canalList;
-
-    @FXML
-    private ListView<?> userList;
-
-    @FXML
-    void sendMessage(ActionEvent event) {
-        messField.clear();
-    }
-
-    @FXML
-    private TextField adresTextField;
-
-    @FXML
-    private TextField portTextField;
-
-    @FXML
-    private Button okConnectionButton;
-
-    @FXML
-    private Button anulujConnectionButton;
-
-    @FXML
-    void anulujConnectionButtonAction(ActionEvent event) {
-
-    }
-
-    @FXML
-    void okConnectionButtonAction(ActionEvent event) {
-        this.connection = new Connection(this.adresTextField.getText(), Integer.parseInt(this.portTextField.getText()));
-        Stage stage = (Stage) this.okConnectionButton.getScene().getWindow();
-        stage.close();
     }
 
     @FXML
@@ -94,46 +70,19 @@ public class FXMLDocumentController {
     }
 
     @FXML
-    void kanalAction(ActionEvent event) {
-        try {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("CanalWindow.fxml"));
-            Parent root = fxmlLoader.load();
-            Stage stage = new Stage();
-            stage.setTitle("Zarządzanie Kanałami");
-            stage.setScene(new Scene(root));
-            stage.show();
-        } catch (IOException ex) {
-            Logger.getLogger(FXMLDocumentController.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-    
-    @FXML
-    private Button okCanalButton;
-
-    @FXML
-    private Button anulujCanalButton;
-
-    @FXML
-    private TextField textFieldCanal;
-
-    @FXML
-    void anulujCanalButtonAction(ActionEvent event) {
+    void sendMessage(ActionEvent event) {
 
     }
 
-    @FXML
-    void okCanalButtonAction(ActionEvent event) {
-
-    }
-
-    @FXML
-    void textFieldCanalAction(ActionEvent event) {
-
-    }
-
-
-    @FXML
+    @FXML // This method is called by the FXMLLoader when initialization is complete
     void initialize() {
+        assert messField != null : "fx:id=\"messField\" was not injected: check your FXML file 'FXMLDocument.fxml'.";
+        assert textFlow != null : "fx:id=\"textFlow\" was not injected: check your FXML file 'FXMLDocument.fxml'.";
+        assert polaczSubMenu != null : "fx:id=\"polaczSubMenu\" was not injected: check your FXML file 'FXMLDocument.fxml'.";
+        assert dolaczSubMenu != null : "fx:id=\"dolaczSubMenu\" was not injected: check your FXML file 'FXMLDocument.fxml'.";
+        assert utworzSubMenu != null : "fx:id=\"utworzSubMenu\" was not injected: check your FXML file 'FXMLDocument.fxml'.";
+        assert canalList != null : "fx:id=\"canalList\" was not injected: check your FXML file 'FXMLDocument.fxml'.";
+        assert userList != null : "fx:id=\"userList\" was not injected: check your FXML file 'FXMLDocument.fxml'.";
 
     }
 }
