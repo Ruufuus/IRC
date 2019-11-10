@@ -10,3 +10,11 @@ Osiagniete cele:
 -dodac obsluge Nickname'ow
 -dodac obsluge wielu pokoi
 -dodac ochrone przed fragmentacja danych
+
+
+#komendy
+$join
+$room_list
+$user_list
+$username
+$color

@@ -38,20 +38,23 @@
         this->room_alive=true;
     };
     void room::send_user_list(int socket_descriptor){
-       char * buffor; 
+       char *  buffor = new char [BUFF_SIZE];
+       strcpy(buffor,"$user_list ");
        for (int i=0;i<MAX_USERS_CONNECTED_TO_CHANNEL;i++){
             if(this->user_list[i].get_socket_description_id()!=-1)
                 {
-                    buffor = new char [BUFF_SIZE];
-                    strcpy(buffor,this->user_list[i].get_username().c_str());
+                   
+                    strcat(buffor,this->user_list[i].get_username().c_str());
                     strcat(buffor,"@");
                     strcat(buffor,this->user_list[i].get_color().c_str());
                     strcat(buffor," ");
-                    sending_message(socket_descriptor,buffor);
-                    delete(buffor);
+                    
 
                 }
         } 
+        strcat(buffor,"\n");
+        sending_message(socket_descriptor,buffor);
+        delete(buffor);
     };
     int room::get_user_sd(int index){
         return this->user_list[index].get_socket_description_id();
@@ -68,6 +71,7 @@
                 return this->user_list[i];
             }
         }
+        printf("nie znaleziono usera\n");
         user empty_user;
         return empty_user;
     };

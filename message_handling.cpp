@@ -15,7 +15,7 @@ void sending_message(int connection_socket_descriptor, char * tresc){
         write_result+=write(connection_socket_descriptor,temp,strlen(temp));
         delete temp;
     }while(write_result!=message_length);
-
+    
 };
 
 
@@ -28,6 +28,7 @@ char * reading_message(int connection_socket_descriptor,bool * connected){
     char * buffor = new char[BUFF_SIZE];
     char * temp = new char;
     int read_result;
+    memset(buffor,'\0',sizeof(char)*BUFF_SIZE);
     do{
         read_result=read(connection_socket_descriptor,temp,1);
         if(read_result<0)
@@ -63,5 +64,6 @@ int command_detection(char * message, char ** command){
                 break;
             }
     }
+
     return command_number;
 };

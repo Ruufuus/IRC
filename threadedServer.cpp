@@ -62,13 +62,15 @@ void *ThreadBehavior(void *t_data)
         }
         else if(command_number==4){
             char * buff = new char [BUFF_SIZE];
+            memset(buff,'\0',sizeof(char)*BUFF_SIZE);
+            strcpy(buff,"$room_list ");
             for(int i=0;i<MAX_ROOMS;i++){
                 if(!th_data->room_list[i].get_if_alive())
                     continue;
-                if(i!=0)
-                strcat(buff," ");
                 strcat(buff,th_data->room_list[i].get_room_name().c_str());
+                strcat(buff," ");
             }
+            strcat(buff,"\n");
             sending_message(th_data->connection_socket_descriptor,buff);
             delete buff;
         }
@@ -91,6 +93,7 @@ void *ThreadBehavior(void *t_data)
             close(th_data->connection_socket_descriptor);
             th_data->room_list[th_data->room_index].remove_user(th_data->connection_socket_descriptor);
         }
+        memset(buffor,'\0',sizeof(char)*BUFF_SIZE);
         delete buffor;
     }
     delete th_data;
