@@ -20,9 +20,13 @@ import javafx.stage.Stage;
  */
 public class IRCClient extends Application {
 
+    private FXMLDocumentController controller;
+
     @Override
     public void start(Stage stage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("FXMLDocument.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("FXMLDocument.fxml"));
+        Parent root = fxmlLoader.load();
+        controller = fxmlLoader.getController();
 
         Scene scene = new Scene(root);
         stage.setTitle("IRC H4XXXOR CLIENT");

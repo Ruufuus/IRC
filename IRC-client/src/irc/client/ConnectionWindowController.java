@@ -14,7 +14,7 @@ import javafx.stage.Stage;
 
 public class ConnectionWindowController {
     
-    private FXMLDocumentController parentController ;
+    private FXMLDocumentController parentController;
     
     void setParentController(FXMLDocumentController controller){
         this.parentController = controller;
