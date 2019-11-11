@@ -99,8 +99,12 @@ void *ThreadBehavior(void *t_data)
                 strcat(buff,th_data->room_list[i].get_room_name().c_str());
                 strcat(buff," ");
             }
+            strcat(buff,"\n");
             pthread_mutex_unlock(&(th_data->room_list_mutex));
+            th_data->room_list[th_data->room_index].sending_mutex_lock();
             sending_message(th_data->connection_socket_descriptor,buff);
+            th_data->room_list[th_data->room_index].sending_mutex_unlock();
+            
             delete buff;
         }
         else if(command_number==5){

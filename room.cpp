@@ -27,8 +27,8 @@
         return this->room_alive;
     };
     bool room::add_user(user user){
-        pthread_mutex_lock(&(this->room_user_list_mutex));
         bool add_result = false;
+        this->lock_user_list_mutex();
         for (int i=0;i<MAX_USERS_CONNECTED_TO_CHANNEL;i++){
             if(this->user_list[i].get_socket_description_id()==-1)
                 {
@@ -38,13 +38,13 @@
                     break;
                 }
         }
-        pthread_mutex_unlock(&(this->room_user_list_mutex));
+        this->unlock_user_list_mutex();
         return add_result;
     };
     void room::send_user_list(int socket_descriptor){
        char *  buffor = new char [BUFF_SIZE];
        strcpy(buffor,"$user_list ");
-       pthread_mutex_lock(&(this->room_user_list_mutex));
+       this->lock_user_list_mutex();
        for (int i=0;i<MAX_USERS_CONNECTED_TO_CHANNEL;i++){
             if(this->user_list[i].get_socket_description_id()!=-1)
                 {
@@ -57,26 +57,29 @@
 
                 }
         } 
-        pthread_mutex_unlock(&(this->room_user_list_mutex));
+        this->unlock_user_list_mutex();
+        strcat(buffor,"\n");
+        this->sending_mutex_lock();
         sending_message(socket_descriptor,buffor);
+        this->sending_mutex_unlock();
         delete(buffor);
     };
     int room::get_user_sd(int index){
-        pthread_mutex_lock(&(this->room_user_list_mutex));
+        this->lock_user_list_mutex();
         int temp=this->user_list[index].get_socket_description_id();
-        pthread_mutex_unlock(&(this->room_user_list_mutex));
+        this->unlock_user_list_mutex();
         return temp;
     };
     user room::get_user(int socket_descriptor){
-        pthread_mutex_lock(&(this->room_user_list_mutex));
+        this->lock_user_list_mutex();
         for(int i=0;i<MAX_USERS_CONNECTED_TO_CHANNEL;i++){
             if(this->user_list[i].get_socket_description_id()==socket_descriptor)
             {
-                pthread_mutex_unlock(&(this->room_user_list_mutex));
+                this->unlock_user_list_mutex();
                 return this->user_list[i];
             }
         }
-        pthread_mutex_unlock(&(this->room_user_list_mutex));
+        this->unlock_user_list_mutex();
         printf("nie znaleziono usera\n");
         user empty_user;
         return empty_user;
@@ -99,7 +102,7 @@
         this->room_alive=false;
     };
     void room::send_to_everyone(char * buffor){
-        pthread_mutex_lock(&(this->room_sending_mutex));
+        this->sending_mutex_lock();
         for(int i=0;i<MAX_USERS_CONNECTED_TO_CHANNEL;i++)
         {
             int socket_desc=this->get_user_sd(i);
@@ -107,7 +110,7 @@
                 sending_message(socket_desc,buffor);
             }
         }
-        pthread_mutex_unlock(&(this->room_sending_mutex));
+        this->sending_mutex_unlock();
     };
     void room::sending_mutex_unlock(){
         pthread_mutex_unlock(&(this->room_sending_mutex));
