@@ -7,10 +7,17 @@ void sending_message(int connection_socket_descriptor, char * tresc){
     tymczasowo coraz to mniejsza czesc tresci messagei
     */
     int write_result=0;
+    int current_write_result;
     do{
     std::string new_message = std::string(tresc);
     new_message=new_message.substr(write_result);
-    write_result+=write(connection_socket_descriptor,new_message.c_str(),strlen(new_message.c_str()));
+    current_write_result=write(connection_socket_descriptor,new_message.c_str(),strlen(new_message.c_str()));
+     if(current_write_result<0)
+        {
+            fprintf(stderr, "Błąd przy próbie wyslania wiadomosci");
+            exit(1);
+        }
+    write_result+=current_write_result;
     }while(write_result!=int(strlen(tresc)));
     
 };
@@ -30,7 +37,7 @@ char * reading_message(int connection_socket_descriptor,bool * connected){
         read_result=read(connection_socket_descriptor,temp,1);
         if(read_result<0)
         {
-            fprintf(stderr, "Błąd przy próbie odczytu");
+            fprintf(stderr, "Błąd przy próbie odczytu wiadomosci");
             exit(1);
         }
         else if(read_result==0){

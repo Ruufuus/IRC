@@ -20,13 +20,7 @@ void *ThreadBehavior(void *t_data)
         int command_number = command_detection(buffor,th_data->command);
         if(command_number==0){
             printf("Uzytkownik podlaczony do socketu %d rozlaczyl sie!\n",th_data->connection_socket_descriptor);
-            char* buff = new char[30];
-            strcpy(buff,"connection ended");
-            th_data->room_list[th_data->room_index].sending_mutex_lock();
-            sending_message(th_data->connection_socket_descriptor,buff);
-            th_data->room_list[th_data->room_index].sending_mutex_unlock();
             connected=false;
-            delete buff;
         }
         else if(command_number==1){
             bool czy_dolaczono=false;
