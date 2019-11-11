@@ -19,7 +19,7 @@ class room{
         bool add_user(user user);
         void sending_mutex_unlock();
         void sending_mutex_lock();
-        void send_user_list(int socket_descriptor);
+        char * get_user_list();
         bool get_if_alive();
         user get_user(int socket_descriptor);
         std::string get_room_name();

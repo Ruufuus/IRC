@@ -41,8 +41,9 @@
         this->unlock_user_list_mutex();
         return add_result;
     };
-    void room::send_user_list(int socket_descriptor){
+    char * room::get_user_list(){
        char *  buffor = new char [BUFF_SIZE];
+       memset(buffor,'\0',BUFF_SIZE);
        strcpy(buffor,"$user_list ");
        this->lock_user_list_mutex();
        for (int i=0;i<MAX_USERS_CONNECTED_TO_CHANNEL;i++){
@@ -59,10 +60,7 @@
         } 
         this->unlock_user_list_mutex();
         strcat(buffor,"\n");
-        this->sending_mutex_lock();
-        sending_message(socket_descriptor,buffor);
-        this->sending_mutex_unlock();
-        delete(buffor);
+        return buffor;
     };
     int room::get_user_sd(int index){
         this->lock_user_list_mutex();

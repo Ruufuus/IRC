@@ -7,6 +7,30 @@
 
 class room;
 class user;
+void send_actual_user_list(thread_data_t * th_data){
+    char * message = th_data->room_list[th_data->room_index].get_user_list();
+    th_data->room_list[th_data->room_index].send_to_everyone(message);
+    delete message;
+}
+void send_actual_room_list(thread_data_t * th_data){
+    char * buff = new char [BUFF_SIZE];
+        memset(buff,'\0',sizeof(char)*BUFF_SIZE);
+        strcpy(buff,"$room_list ");
+        for(int i=0;i<MAX_ROOMS;i++){
+            if(!th_data->room_list[i].get_if_alive())
+                continue;
+            strcat(buff,th_data->room_list[i].get_room_name().c_str());
+            strcat(buff," ");
+        }
+        strcat(buff,"\n");
+        for(int i=0;i<MAX_ROOMS;i++){
+            if(!th_data->room_list[i].get_if_alive())
+                continue;
+            th_data->room_list[i].send_to_everyone(buff);
+        }
+        
+        delete buff;
+}
 //funkcja opisującą zachowanie wątku - musi przyjmować argument typu (void *) i zwracać (void *)
 void *ThreadBehavior(void *t_data)
 {
@@ -14,12 +38,12 @@ void *ThreadBehavior(void *t_data)
     bool connected=true;
     thread_data_t *th_data = (thread_data_t*)t_data;
     char * buffor;
+    send_actual_user_list(th_data);
     while(connected)
     {
         buffor=reading_message(th_data->connection_socket_descriptor,&connected);
         int command_number = command_detection(buffor,th_data->command);
         if(command_number==0){
-            printf("Uzytkownik podlaczony do socketu %d rozlaczyl sie!\n",th_data->connection_socket_descriptor);
             connected=false;
         }
         else if(command_number==1){
@@ -32,6 +56,7 @@ void *ThreadBehavior(void *t_data)
                     {
                         th_data->room_list[th_data->room_index].remove_user(th_data->connection_socket_descriptor);
                         th_data->room_index=i;
+                        send_actual_user_list(th_data);
                         printf("User polaczony na sockecie %d dolaczyl do kanalu %s\n",th_data->connection_socket_descriptor,buffor);
                     }
                     else{
@@ -59,6 +84,7 @@ void *ThreadBehavior(void *t_data)
                         th_data->room_list[th_data->room_index].remove_user(th_data->connection_socket_descriptor);
                         th_data->room_index=i; 
                         czy_stworzono=true;
+                        send_actual_room_list(th_data);
                         printf("User polaczony na sockecie %d stworzyl kanal %s\n",th_data->connection_socket_descriptor,buffor);
                         break;
                     }
@@ -81,12 +107,15 @@ void *ThreadBehavior(void *t_data)
                 new_user.set_username(buffor);
                 th_data->room_list[th_data->room_index].remove_user(th_data->connection_socket_descriptor);
                 th_data->room_list[th_data->room_index].add_user(new_user);
+                send_actual_user_list(th_data);
             }
         else if(command_number==3){
                 user new_user = th_data->room_list[th_data->room_index].get_user(th_data->connection_socket_descriptor);
                 new_user.set_color(buffor);
                 th_data->room_list[th_data->room_index].remove_user(th_data->connection_socket_descriptor);
                 th_data->room_list[th_data->room_index].add_user(new_user);
+                send_actual_user_list(th_data);
+
         }
         else if(command_number==4){
             char * buff = new char [BUFF_SIZE];
@@ -108,7 +137,12 @@ void *ThreadBehavior(void *t_data)
             delete buff;
         }
         else if(command_number==5){
-            th_data->room_list[th_data->room_index].send_user_list(th_data->connection_socket_descriptor);
+            char * message = th_data->room_list[th_data->room_index].get_user_list();
+            th_data->room_list[th_data->room_index].sending_mutex_lock();
+            sending_message(th_data->connection_socket_descriptor,message);
+            th_data->room_list[th_data->room_index].sending_mutex_unlock();
+            delete message;
+            
         }
         if(connected && command_number==-1)
         {
@@ -131,8 +165,9 @@ void *ThreadBehavior(void *t_data)
         }
         else if(command_number==0 || !connected)
         {
-            printf("Uzytkownik sie rozlaczyl!\n");
+            printf("Uzytkownik podlaczony do socketu %d rozlaczyl sie!\n",th_data->connection_socket_descriptor);
             th_data->room_list[th_data->room_index].remove_user(th_data->connection_socket_descriptor);
+            send_actual_user_list(th_data);
         }
         delete buffor;
     }

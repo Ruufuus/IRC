@@ -1,4 +1,4 @@
-#define SERVER_PORT 2222
+#define SERVER_PORT 1234
 #define QUEUE_SIZE 5
 #define BUFF_SIZE 1024
 #define COMMAND_ARRAY_SIZE 6
