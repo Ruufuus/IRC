@@ -34,8 +34,8 @@ public class ConnectionWindowController {
 
     @FXML
     void anulujConnectionButtonAction(ActionEvent event) {
-        
-
+        Stage stage = (Stage) this.anulujConnectionButton.getScene().getWindow();
+        stage.close();
     }
 
     @FXML
