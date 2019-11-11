@@ -13,7 +13,13 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 public class ConnectionWindowController {
-
+    
+    private FXMLDocumentController parentController ;
+    
+    void setParentController(FXMLDocumentController controller){
+        this.parentController = controller;
+    }
+    
     @FXML // ResourceBundle that was given to the FXMLLoader
     private ResourceBundle resources;
 
@@ -41,7 +47,7 @@ public class ConnectionWindowController {
 
     @FXML
     void okConnectionButtonAction(ActionEvent event) {
-        FXMLDocumentController.connection = new Connection(this.adresTextField.getText(), Integer.parseInt(this.portTextField.getText()));
+        FXMLDocumentController.connection = new Connection(this.adresTextField.getText(), Integer.parseInt(this.portTextField.getText()), parentController);
         new Thread(FXMLDocumentController.connection).start();
         Stage stage = (Stage) this.okConnectionButton.getScene().getWindow();
         FXMLDocumentController.polaczWindow = false;

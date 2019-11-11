@@ -7,12 +7,10 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Text?>
-<?import javafx.scene.text.TextFlow?>
 
 <AnchorPane id="AnchorPane" prefHeight="720.0" prefWidth="1280.0" style="-fx-background-color: black;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="irc.client.FXMLDocumentController">
    <children>
-      <TextField fx:id="messField" layoutX="306.0" layoutY="639.0" onAction="#sendMessage" prefHeight="61.0" prefWidth="669.0" promptText="Twoja wiadomość..." style="-fx-background-color: black; -fx-border-color: white; -fx-text-fill: lime;" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="306.0" AnchorPane.rightAnchor="305.0" />
-      <TextFlow fx:id="textFlow" layoutX="306.0" layoutY="37.0" prefHeight="589.0" prefWidth="669.0" style="-fx-background-color: black; -fx-border-color: white;" AnchorPane.bottomAnchor="94.0" AnchorPane.leftAnchor="306.0" AnchorPane.rightAnchor="305.0" AnchorPane.topAnchor="40.0" />
+      <TextField fx:id="messField" layoutX="306.0" layoutY="639.0" onAction="#sendMessage" prefHeight="61.0" prefWidth="669.0" promptText="Twoja wiadomość..." style="-fx-background-color: black; -fx-border-color: white; -fx-text-fill: lime;" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="305.0" AnchorPane.rightAnchor="305.0" />
       <MenuBar style="-fx-background-color: black;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <menus>
             <Menu mnemonicParsing="false" text="Server">
@@ -38,5 +36,6 @@
       <ListView fx:id="userList" layoutX="988.0" layoutY="40.0" prefHeight="660.0" prefWidth="275.0" style="-fx-background-color: black; -fx-border-color: white;" AnchorPane.bottomAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="40.0" />
       <Text fill="LIME" layoutX="20.0" layoutY="38.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Lista kanałów:" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="25.0" />
       <Text fill="LIME" layoutX="985.0" layoutY="38.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Lista użytkowników na kanale:" AnchorPane.rightAnchor="136.55078125" />
+      <ListView fx:id="messageList" layoutX="306.0" layoutY="40.0" prefHeight="589.0" prefWidth="669.0" AnchorPane.bottomAnchor="90.0" AnchorPane.leftAnchor="305.0" AnchorPane.rightAnchor="305.0" AnchorPane.topAnchor="40.0" />
    </children>
 </AnchorPane>

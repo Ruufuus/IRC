@@ -10,6 +10,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.stage.Stage;
 
 public class CanalWindowController {
 
@@ -30,12 +31,16 @@ public class CanalWindowController {
 
     @FXML
     void anulujCanalButtonAction(ActionEvent event) {
-
+        Stage stage = (Stage) this.anulujCanalButton.getScene().getWindow();
+        FXMLDocumentController.kanalWindow = false;
+        stage.close();
     }
 
     @FXML
     void okCanalButtonAction(ActionEvent event) {
-
+        Stage stage = (Stage) this.okCanalButton.getScene().getWindow();
+        FXMLDocumentController.kanalWindow = false;
+        stage.close();
     }
 
     @FXML

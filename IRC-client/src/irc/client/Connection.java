@@ -12,18 +12,23 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.concurrent.Task;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 
 /**
  *
  * @author Robert Ciemny
  */
-public class Connection implements Runnable{
+public class Connection implements Runnable {
 
     private Socket clientSocket = null;
     private BufferedReader reader = null;
     private PrintWriter writer = null;
     private boolean running;
-    
+    private final FXMLDocumentController controller;
+
     /**
      * @return the clientSocket
      */
@@ -37,9 +42,9 @@ public class Connection implements Runnable{
     public void setClientSocket(Socket clientSocket) {
         this.clientSocket = clientSocket;
     }
-    
-    
-    public Connection(String ip, int port){
+
+    public Connection(String ip, int port, FXMLDocumentController controller) {
+        this.controller = controller;
         try {
             this.clientSocket = new Socket(ip, port);
             this.running = true;
@@ -47,26 +52,43 @@ public class Connection implements Runnable{
             Logger.getLogger(Connection.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
-    public void sendMessage(String clientMessage) throws IOException{
-        writer = new PrintWriter(getClientSocket().getOutputStream(), true);
-        writer.println(clientMessage);
+
+    public void sendMessage(String clientMessage) {
+        new Thread() {
+            @Override
+            public void run() {
+                try {
+                    writer = new PrintWriter(getClientSocket().getOutputStream(), true);
+                    writer.println(clientMessage);
+                } catch (IOException ex) {
+                    Logger.getLogger(Connection.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }.start();
     }
 
     @Override
     public void run() {
-        while(running){
+        
+        while (running) {
             try {
                 this.reader = new BufferedReader(new InputStreamReader(getClientSocket().getInputStream()));
-                System.out.println(reader.readLine());
             } catch (IOException ex) {
                 Logger.getLogger(Connection.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }
-        try {
-            FXMLDocumentController.connection.getClientSocket().close();
-        } catch (IOException ex) {
-            Logger.getLogger(Connection.class.getName()).log(Level.SEVERE, null, ex);
+            try {
+                String readerLine;
+                while ((readerLine = this.reader.readLine()) != null) {
+                    System.out.println(readerLine); 
+                    controller.appendMessages(readerLine);
+                    Thread.sleep(10);
+  
+                }
+            } catch (IOException ex) {
+                System.out.println("Połączenie zakończono");
+            } catch (InterruptedException ex) {
+                Logger.getLogger(Connection.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 
