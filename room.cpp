@@ -103,8 +103,9 @@
         pthread_mutex_lock(&(this->room_sending_mutex));
         for(int i=0;i<MAX_USERS_CONNECTED_TO_CHANNEL;i++)
         {
-            if(this->get_user_sd(i)!=-1){
-                sending_message(this->get_user_sd(i),buffor);
+            int socket_desc=this->get_user_sd(i);
+            if(socket_desc!=-1){
+                sending_message(socket_desc,buffor);
             }
         }
         pthread_mutex_unlock(&(this->room_sending_mutex));

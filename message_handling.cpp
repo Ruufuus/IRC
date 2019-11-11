@@ -7,14 +7,11 @@ void sending_message(int connection_socket_descriptor, char * tresc){
     tymczasowo coraz to mniejsza czesc tresci messagei
     */
     int write_result=0;
-    int message_length=strlen(tresc);
-    char * temp;
     do{
-        temp = new char[message_length-write_result];
-        strncpy(temp,tresc+write_result,message_length-write_result);
-        write_result+=write(connection_socket_descriptor,temp,strlen(temp));
-        delete temp;
-    }while(write_result!=message_length);
+    std::string new_message = std::string(tresc);
+    new_message=new_message.substr(write_result);
+    write_result+=write(connection_socket_descriptor,new_message.c_str(),strlen(new_message.c_str()));
+    }while(write_result!=strlen(tresc));
     
 };
 

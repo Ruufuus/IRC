@@ -22,7 +22,9 @@ void *ThreadBehavior(void *t_data)
             printf("Uzytkownik podlaczony do socketu %d rozlaczyl sie!\n",th_data->connection_socket_descriptor);
             char* buff = new char[30];
             strcpy(buff,"connection ended");
+            th_data->room_list[th_data->room_index].sending_mutex_lock();
             sending_message(th_data->connection_socket_descriptor,buff);
+            th_data->room_list[th_data->room_index].sending_mutex_unlock();
             connected=false;
             delete buff;
         }
@@ -104,7 +106,6 @@ void *ThreadBehavior(void *t_data)
                 strcat(buff," ");
             }
             pthread_mutex_unlock(&(th_data->room_list_mutex));
-            strcat(buff,"\n");
             sending_message(th_data->connection_socket_descriptor,buff);
             delete buff;
         }
@@ -114,7 +115,21 @@ void *ThreadBehavior(void *t_data)
         if(connected && command_number==-1)
         {
             printf("Wysylanie wiadomosci o tresci %s",buffor);
-            th_data->room_list[th_data->room_index].send_to_everyone(buffor);
+            time_t rawtime;
+            struct tm * timeinfo;
+            char * formatted_message = new char [BUFF_SIZE];
+            memset(formatted_message,'\0',sizeof(char)*BUFF_SIZE);
+            time (&rawtime);
+            timeinfo = localtime(&rawtime);
+            strftime(formatted_message,BUFF_SIZE,"%H:%M:%S ",timeinfo);
+            user temp_user = th_data->room_list[th_data->room_index].get_user(th_data->connection_socket_descriptor);
+            strcat(formatted_message,temp_user.get_username().c_str());
+            strcat(formatted_message,"@");
+            strcat(formatted_message,temp_user.get_color().c_str());
+            strcat(formatted_message," ");
+            strcat(formatted_message,buffor);
+            th_data->room_list[th_data->room_index].send_to_everyone(formatted_message);
+            delete formatted_message;
         }
         else if(command_number==0 || !connected)
         {
