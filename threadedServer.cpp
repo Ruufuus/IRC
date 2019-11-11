@@ -114,7 +114,6 @@ void *ThreadBehavior(void *t_data)
         }
         if(connected && command_number==-1)
         {
-            printf("Wysylanie wiadomosci o tresci %s",buffor);
             time_t rawtime;
             struct tm * timeinfo;
             char * formatted_message = new char [BUFF_SIZE];
@@ -128,6 +127,7 @@ void *ThreadBehavior(void *t_data)
             strcat(formatted_message,temp_user.get_color().c_str());
             strcat(formatted_message," ");
             strcat(formatted_message,buffor);
+             printf("Wysylanie wiadomosci o tresci %s",formatted_message);
             th_data->room_list[th_data->room_index].send_to_everyone(formatted_message);
             delete formatted_message;
         }

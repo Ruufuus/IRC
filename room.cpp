@@ -58,7 +58,6 @@
                 }
         } 
         pthread_mutex_unlock(&(this->room_user_list_mutex));
-        strcat(buffor,"\n");
         sending_message(socket_descriptor,buffor);
         delete(buffor);
     };

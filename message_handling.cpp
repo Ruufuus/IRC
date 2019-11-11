@@ -11,7 +11,7 @@ void sending_message(int connection_socket_descriptor, char * tresc){
     std::string new_message = std::string(tresc);
     new_message=new_message.substr(write_result);
     write_result+=write(connection_socket_descriptor,new_message.c_str(),strlen(new_message.c_str()));
-    }while(write_result!=strlen(tresc));
+    }while(write_result!=int(strlen(tresc)));
     
 };
 
