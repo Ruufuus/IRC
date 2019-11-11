@@ -19,3 +19,4 @@ $user_list
 $username
 $color
 $leave
+$error

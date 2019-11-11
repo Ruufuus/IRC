@@ -33,8 +33,8 @@ char * reading_message(int connection_socket_descriptor,bool * connected){
         read_result=read(connection_socket_descriptor,temp,1);
         if(read_result<0)
         {
-            printf("Nastapil blad przy odczycie!\n");
-            break;
+            fprintf(stderr, "Błąd przy próbie odczytu");
+            exit(1);
         }
         else if(read_result==0){
             *connected=false;

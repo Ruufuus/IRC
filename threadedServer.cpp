@@ -21,27 +21,40 @@ void *ThreadBehavior(void *t_data)
         if(command_number==0){
             printf("Uzytkownik podlaczony do socketu %d rozlaczyl sie!\n",th_data->connection_socket_descriptor);
             char* buff = new char[30];
-            strcpy(buff,"connection ended\n");
+            strcpy(buff,"connection ended");
             sending_message(th_data->connection_socket_descriptor,buff);
             connected=false;
             delete buff;
-            th_data->room_list[th_data->room_index].remove_user(th_data->connection_socket_descriptor);
         }
         else if(command_number==1){
             bool czy_dolaczono=false;
+            pthread_mutex_lock(&(th_data->room_list_mutex));
             for(int i=0;i<MAX_ROOMS;i++){
                 if(!strcmp(th_data->room_list[i].get_room_name().c_str(),buffor)){
                     user temp_user = th_data->room_list[th_data->room_index].get_user(th_data->connection_socket_descriptor);
-                    th_data->room_list[th_data->room_index].remove_user(th_data->connection_socket_descriptor);
-                    th_data->room_index=i;
-                    th_data->room_list[i].add_user(temp_user);
-                    czy_dolaczono=true;
-                    printf("User polaczony na sockecie %d dolaczyl do kanalu %s\n",th_data->connection_socket_descriptor,buffor);
+                    if(th_data->room_list[i].add_user(temp_user))
+                    {
+                        th_data->room_list[th_data->room_index].remove_user(th_data->connection_socket_descriptor);
+                        th_data->room_index=i;
+                        printf("User polaczony na sockecie %d dolaczyl do kanalu %s\n",th_data->connection_socket_descriptor,buffor);
+                    }
+                    else{
+                        char * error = new char [100];
+                        memset(error,'\0',sizeof(char)*100);
+                        strcpy(error,"$error Nie udalo sie dolaczyc do kanalu");
+                        th_data->room_list[th_data->room_index].sending_mutex_lock();
+                        sending_message(th_data->connection_socket_descriptor,error);
+                        th_data->room_list[th_data->room_index].sending_mutex_unlock();
+                        delete error;
+                    }
+                    czy_dolaczono=true; 
                     break;
                 }
             }
+            pthread_mutex_unlock(&(th_data->room_list_mutex));
             if(!czy_dolaczono){
                 bool czy_stworzono=false;
+                pthread_mutex_lock(&(th_data->room_list_mutex));
                 for(int i=1;i<MAX_ROOMS;i++){
                     if(!th_data->room_list[i].get_if_alive()){
                         user temp_user = th_data->room_list[th_data->room_index].get_user(th_data->connection_socket_descriptor);
@@ -54,7 +67,15 @@ void *ThreadBehavior(void *t_data)
                         break;
                     }
                 }
+                pthread_mutex_unlock(&(th_data->room_list_mutex));
                 if(!czy_stworzono){
+                    char * error = new char [100];
+                    memset(error,'\0',sizeof(char)*100);
+                    strcpy(error,"$error Nie udalo sie utworzyc kanalu");
+                    th_data->room_list[th_data->room_index].sending_mutex_lock();
+                    sending_message(th_data->connection_socket_descriptor,error);
+                    th_data->room_list[th_data->room_index].sending_mutex_unlock();
+                    delete error;
                     printf("User'owi polaczonemu na sockecie %d nie udalo sie dolaczyc do kanalu llub go stworzyc\n",th_data->connection_socket_descriptor);
                 }
             }
@@ -67,7 +88,7 @@ void *ThreadBehavior(void *t_data)
             }
         else if(command_number==3){
                 user new_user = th_data->room_list[th_data->room_index].get_user(th_data->connection_socket_descriptor);
-                new_user.set_username(buffor);
+                new_user.set_color(buffor);
                 th_data->room_list[th_data->room_index].remove_user(th_data->connection_socket_descriptor);
                 th_data->room_list[th_data->room_index].add_user(new_user);
         }
@@ -75,12 +96,14 @@ void *ThreadBehavior(void *t_data)
             char * buff = new char [BUFF_SIZE];
             memset(buff,'\0',sizeof(char)*BUFF_SIZE);
             strcpy(buff,"$room_list ");
+            pthread_mutex_lock(&(th_data->room_list_mutex));
             for(int i=0;i<MAX_ROOMS;i++){
                 if(!th_data->room_list[i].get_if_alive())
                     continue;
                 strcat(buff,th_data->room_list[i].get_room_name().c_str());
                 strcat(buff," ");
             }
+            pthread_mutex_unlock(&(th_data->room_list_mutex));
             strcat(buff,"\n");
             sending_message(th_data->connection_socket_descriptor,buff);
             delete buff;
@@ -88,17 +111,12 @@ void *ThreadBehavior(void *t_data)
         else if(command_number==5){
             th_data->room_list[th_data->room_index].send_user_list(th_data->connection_socket_descriptor);
         }
-        else if(connected)
+        if(connected && command_number==-1)
         {
-            printf("Serwer otrzymal message o tresci: %s\n",buffor);
-            for(int i=0;i<MAX_USERS_CONNECTED_TO_CHANNEL;i++)
-                {
-                    if(th_data->room_list[th_data->room_index].get_user_sd(i)!=-1 && th_data->room_list[th_data->room_index].get_user_sd(i)!=th_data->connection_socket_descriptor){
-                        sending_message(th_data->room_list[th_data->room_index].get_user_sd(i),buffor);
-                    }
-                }
+            printf("Wysylanie wiadomosci o tresci %s",buffor);
+            th_data->room_list[th_data->room_index].send_to_everyone(buffor);
         }
-        else
+        else if(command_number==0 || !connected)
         {
             printf("Uzytkownik sie rozlaczyl!\n");
             th_data->room_list[th_data->room_index].remove_user(th_data->connection_socket_descriptor);
@@ -111,7 +129,7 @@ void *ThreadBehavior(void *t_data)
 }
 
 //funkcja obsługująca połączenie z nowym klientem
-void handleConnection(int connection_socket_descriptor,char ** command,room * room_list) {
+void handleConnection(int connection_socket_descriptor,char ** command,room * room_list,pthread_mutex_t room_list_mutex) {
     //wynik funkcji tworzącej wątek
     int create_result = 0;
 
@@ -124,6 +142,7 @@ void handleConnection(int connection_socket_descriptor,char ** command,room * ro
     t_data->command=command;
     t_data->room_list=room_list;
     t_data->room_index=0;
+    t_data->room_list_mutex=room_list_mutex;
     create_result = pthread_create(&thread1, NULL, ThreadBehavior, (void *)t_data);
     if (create_result){
     printf("Błąd przy próbie utworzenia wątku, kod błędu: %d\n", create_result);
@@ -150,6 +169,13 @@ int main(int argc, char* argv[])
    int bind_result;
    int listen_result;
    char reuse_addr_val = 1;
+   pthread_mutex_t room_list_mutex;
+   int mutex_room_list_init_result = pthread_mutex_init(&room_list_mutex,NULL);
+        if (mutex_room_list_init_result < 0)
+        {
+            fprintf(stderr, "Błąd przy próbie zainicjalizowania mutexa");
+            exit(1);
+        }
    struct sockaddr_in server_address;
 
    //inicjalizacja gniazda serwera
@@ -189,7 +215,7 @@ int main(int argc, char* argv[])
            exit(1);
        }
 
-       handleConnection(connection_socket_descriptor,command,room_list);
+       handleConnection(connection_socket_descriptor,command,room_list,room_list_mutex);
    }
    for (int i = 0; i<COMMAND_ARRAY_SIZE;i++)
         delete command[i];

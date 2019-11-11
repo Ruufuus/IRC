@@ -2,7 +2,7 @@
 #define QUEUE_SIZE 5
 #define BUFF_SIZE 1024
 #define COMMAND_ARRAY_SIZE 6
-#define MAX_USERS_CONNECTED_TO_CHANNEL 20
+#define MAX_USERS_CONNECTED_TO_CHANNEL 2
 #define MAX_ROOMS 10
 
 #include <vector>
