@@ -35,6 +35,7 @@ public class ConnectionWindowController {
     @FXML
     void anulujConnectionButtonAction(ActionEvent event) {
         Stage stage = (Stage) this.anulujConnectionButton.getScene().getWindow();
+        FXMLDocumentController.polaczWindow = false;
         stage.close();
     }
 
@@ -43,6 +44,7 @@ public class ConnectionWindowController {
         FXMLDocumentController.connection = new Connection(this.adresTextField.getText(), Integer.parseInt(this.portTextField.getText()));
         new Thread(FXMLDocumentController.connection).start();
         Stage stage = (Stage) this.okConnectionButton.getScene().getWindow();
+        FXMLDocumentController.polaczWindow = false;
         stage.close();
 
     }

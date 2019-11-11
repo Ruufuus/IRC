@@ -1,9 +1,8 @@
 /**
  * Sample Skeleton for 'FXMLDocument.fxml' Controller Class
  */
-
 package irc.client;
- 
+
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -19,11 +18,11 @@ import javafx.scene.control.TextField;
 import javafx.scene.text.TextFlow;
 import javafx.scene.control.MenuItem;
 import javafx.stage.Stage;
- 
 
 public class FXMLDocumentController {
-    
+
     static Connection connection = null;
+    static boolean polaczWindow = false;
 
     @FXML // ResourceBundle that was given to the FXMLLoader
     private ResourceBundle resources;
@@ -60,12 +59,15 @@ public class FXMLDocumentController {
     @FXML
     void polaczAction(ActionEvent event) {
         try {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("ConnectionWindow.fxml"));
-            Parent root = fxmlLoader.load();
-            Stage stage = new Stage();
-            stage.setTitle("Połącz");
-            stage.setScene(new Scene(root));
-            stage.show();
+            if (!polaczWindow) {
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("ConnectionWindow.fxml"));
+                Parent root = fxmlLoader.load();
+                Stage stage = new Stage();
+                stage.setTitle("Połącz");
+                stage.setScene(new Scene(root));
+                this.polaczWindow = true;
+                stage.show();
+            }
         } catch (IOException ex) {
             Logger.getLogger(FXMLDocumentController.class.getName()).log(Level.SEVERE, null, ex);
         }
