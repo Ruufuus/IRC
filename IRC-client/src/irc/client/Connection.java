@@ -79,8 +79,15 @@ public class Connection implements Runnable {
             try {
                 String readerLine;
                 while ((readerLine = this.reader.readLine()) != null) {
-                    System.out.println(readerLine); 
-                    controller.appendMessages(readerLine);
+                    System.out.println(readerLine);
+                    final String rl = readerLine;
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            controller.appendMessages(rl);
+                        }
+                    });
+
                     Thread.sleep(10);
   
                 }
