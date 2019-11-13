@@ -2,6 +2,7 @@
 Cele:
 -dodac komentarze do kodu
 -poprawa czytelnosci kodu na samym koncu
+-dodac skrypt w bashu do kompilacji projektu
 Osiagniete cele:
 -podstawowy klient laczy sie z serwerem
 -podstawowi klienci sa w stanie rozmawiac w jednym pokoju miedzy soba
