@@ -13,12 +13,15 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.MenuItem;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 
 public class FXMLDocumentController {
+
     private Connection connection = null;
     private boolean polaczWindow = false;
     private boolean kanalWindow = false;
@@ -85,10 +88,10 @@ public class FXMLDocumentController {
 
     @FXML
     private ListView<String> messageList;
-    
-    void appendMessages(String message){
+
+    void appendMessages(String message) {
         this.messageList.getItems().add(message);
-        System.out.println(this.messageList.getItems());
+        //System.out.println(this.messageList.getItems());
     }
 
     @FXML
@@ -97,10 +100,10 @@ public class FXMLDocumentController {
             if (!isKanalWindow()) {
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("CanalWindow.fxml"));
                 Parent root = fxmlLoader.load();
-                
+
                 CanalWindowController canalController = fxmlLoader.getController();
                 canalController.setParentController(this);
-                
+
                 Stage stage = new Stage();
                 stage.setTitle("Zarządzanie Kanałami");
                 stage.setScene(new Scene(root));
@@ -118,11 +121,11 @@ public class FXMLDocumentController {
             if (!isPolaczWindow()) {
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("ConnectionWindow.fxml"));
                 Parent root = fxmlLoader.load();
-                
+
                 ConnectionWindowController connectionController = fxmlLoader.getController();
-                
+
                 connectionController.setParentController(this);
-                
+
                 Stage stage = new Stage();
                 stage.setTitle("Połącz");
                 stage.setScene(new Scene(root));
@@ -153,6 +156,28 @@ public class FXMLDocumentController {
         assert canalList != null : "fx:id=\"canalList\" was not injected: check your FXML file 'FXMLDocument.fxml'.";
         assert userList != null : "fx:id=\"userList\" was not injected: check your FXML file 'FXMLDocument.fxml'.";
         assert messageList != null : "fx:id=\"messageList\" was not injected: check your FXML file 'FXMLDocument.fxml'.";
-
+        messageList.setCellFactory(new Callback<ListView<String>, ListCell<String>>() {
+            @Override
+            public ListCell<String> call(ListView<String> stringListView) {
+                return new ListCell<String>() {
+                    @Override
+                    protected void updateItem(String s, boolean b) {
+                        super.updateItem(s, b);    //To change body of overridden methods use File | Settings | File Templates.
+                        /*
+                        if (b) {
+                            setText(null);
+                            setGraphic(null);
+                        }
+                         */
+                        if (s != null) {
+                            String color = s.split(" ")[1].split("@")[1];
+                                setStyle("-fx-text-fill: " + color);
+                                //setGraphic();
+                                setText(s);
+                        }
+                    }
+                };
+            }
+        });
     }
 }
