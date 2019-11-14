@@ -12,6 +12,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
