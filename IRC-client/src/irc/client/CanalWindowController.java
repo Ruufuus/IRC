@@ -13,6 +13,12 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 public class CanalWindowController {
+    
+    private FXMLDocumentController parentController;
+    
+    void setParentController(FXMLDocumentController controller){
+        this.parentController = controller;
+    }
 
     @FXML // ResourceBundle that was given to the FXMLLoader
     private ResourceBundle resources;
@@ -32,14 +38,14 @@ public class CanalWindowController {
     @FXML
     void anulujCanalButtonAction(ActionEvent event) {
         Stage stage = (Stage) this.anulujCanalButton.getScene().getWindow();
-        FXMLDocumentController.kanalWindow = false;
+        this.parentController.setKanalWindow(false);
         stage.close();
     }
 
     @FXML
     void okCanalButtonAction(ActionEvent event) {
         Stage stage = (Stage) this.okCanalButton.getScene().getWindow();
-        FXMLDocumentController.kanalWindow = false;
+        this.parentController.setKanalWindow(false);
         stage.close();
     }
 

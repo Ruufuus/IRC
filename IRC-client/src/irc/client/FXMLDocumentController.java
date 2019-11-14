@@ -15,15 +15,55 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
-import javafx.scene.text.TextFlow;
 import javafx.scene.control.MenuItem;
 import javafx.stage.Stage;
 
 public class FXMLDocumentController {
+    private Connection connection = null;
+    private boolean polaczWindow = false;
+    private boolean kanalWindow = false;
 
-    static Connection connection = null;
-    static boolean polaczWindow = false;
-    static boolean kanalWindow = false;
+    /**
+     * @return the connection
+     */
+    public Connection getConnection() {
+        return connection;
+    }
+
+    /**
+     * @param connection the connection to set
+     */
+    public void setConnection(Connection connection) {
+        this.connection = connection;
+    }
+
+    /**
+     * @return the polaczWindow
+     */
+    public boolean isPolaczWindow() {
+        return polaczWindow;
+    }
+
+    /**
+     * @param polaczWindow the polaczWindow to set
+     */
+    public void setPolaczWindow(boolean polaczWindow) {
+        this.polaczWindow = polaczWindow;
+    }
+
+    /**
+     * @return the kanalWindow
+     */
+    public boolean isKanalWindow() {
+        return kanalWindow;
+    }
+
+    /**
+     * @param kanalWindow the kanalWindow to set
+     */
+    public void setKanalWindow(boolean kanalWindow) {
+        this.kanalWindow = kanalWindow;
+    }
 
     @FXML
     private TextField messField;
@@ -54,13 +94,17 @@ public class FXMLDocumentController {
     @FXML
     void kanalAction(ActionEvent event) {
         try {
-            if (!kanalWindow) {
+            if (!isKanalWindow()) {
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("CanalWindow.fxml"));
                 Parent root = fxmlLoader.load();
+                
+                CanalWindowController canalController = fxmlLoader.getController();
+                canalController.setParentController(this);
+                
                 Stage stage = new Stage();
                 stage.setTitle("Zarządzanie Kanałami");
                 stage.setScene(new Scene(root));
-                FXMLDocumentController.kanalWindow = true;
+                this.setKanalWindow(true);
                 stage.show();
             }
         } catch (IOException ex) {
@@ -71,7 +115,7 @@ public class FXMLDocumentController {
     @FXML
     void polaczAction(ActionEvent event) {
         try {
-            if (!polaczWindow) {
+            if (!isPolaczWindow()) {
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("ConnectionWindow.fxml"));
                 Parent root = fxmlLoader.load();
                 
@@ -82,7 +126,7 @@ public class FXMLDocumentController {
                 Stage stage = new Stage();
                 stage.setTitle("Połącz");
                 stage.setScene(new Scene(root));
-                FXMLDocumentController.polaczWindow = true;
+                this.setPolaczWindow(true);
                 stage.show();
             }
         } catch (IOException ex) {
@@ -92,9 +136,9 @@ public class FXMLDocumentController {
 
     @FXML
     void sendMessage(ActionEvent event) throws IOException {
-        if (FXMLDocumentController.connection != null) {
+        if (this.getConnection() != null) {
             String message = this.messField.getText();
-            FXMLDocumentController.connection.sendMessage(message);
+            this.getConnection().sendMessage(message);
             messField.clear();
         }
 
@@ -108,7 +152,7 @@ public class FXMLDocumentController {
         assert utworzSubMenu != null : "fx:id=\"utworzSubMenu\" was not injected: check your FXML file 'FXMLDocument.fxml'.";
         assert canalList != null : "fx:id=\"canalList\" was not injected: check your FXML file 'FXMLDocument.fxml'.";
         assert userList != null : "fx:id=\"userList\" was not injected: check your FXML file 'FXMLDocument.fxml'.";
-        //assert messageList != null : "fx:id=\"messageList\" was not injected: check your FXML file 'FXMLDocument.fxml'.";
+        assert messageList != null : "fx:id=\"messageList\" was not injected: check your FXML file 'FXMLDocument.fxml'.";
 
     }
 }

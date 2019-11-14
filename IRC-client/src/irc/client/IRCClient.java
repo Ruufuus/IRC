@@ -36,13 +36,13 @@ public class IRCClient extends Application {
 
     @Override
     public void stop() throws IOException {
-        if (FXMLDocumentController.connection != null) {
-            FXMLDocumentController.connection.setRunning(false);
+        if (controller.getConnection() != null) {
+            controller.getConnection().setRunning(false);
 
             try {
-                FXMLDocumentController.connection.getClientSocket().shutdownInput();
-                FXMLDocumentController.connection.getClientSocket().shutdownOutput();
-                FXMLDocumentController.connection.getClientSocket().close();
+                controller.getConnection().getClientSocket().shutdownInput();
+                controller.getConnection().getClientSocket().shutdownOutput();
+                controller.getConnection().getClientSocket().close();
             } catch (IOException ex) {
                 Logger.getLogger(Connection.class.getName()).log(Level.SEVERE, null, ex);
             }

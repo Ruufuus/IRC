@@ -41,16 +41,17 @@ public class ConnectionWindowController {
     @FXML
     void anulujConnectionButtonAction(ActionEvent event) {
         Stage stage = (Stage) this.anulujConnectionButton.getScene().getWindow();
-        FXMLDocumentController.polaczWindow = false;
+        this.parentController.setPolaczWindow(false);
         stage.close();
     }
 
     @FXML
     void okConnectionButtonAction(ActionEvent event) {
-        FXMLDocumentController.connection = new Connection(this.adresTextField.getText(), Integer.parseInt(this.portTextField.getText()), parentController);
-        new Thread(FXMLDocumentController.connection).start();
+        this.parentController.setConnection(new Connection(this.adresTextField.getText(), Integer.parseInt(this.portTextField.getText()), parentController));
+        
+        new Thread(this.parentController.getConnection()).start();
         Stage stage = (Stage) this.okConnectionButton.getScene().getWindow();
-        FXMLDocumentController.polaczWindow = false;
+        this.parentController.setPolaczWindow(false);
         stage.close();
 
     }
