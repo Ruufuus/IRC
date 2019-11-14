@@ -161,19 +161,13 @@ public class FXMLDocumentController {
             public ListCell<String> call(ListView<String> stringListView) {
                 return new ListCell<String>() {
                     @Override
-                    protected void updateItem(String s, boolean b) {
-                        super.updateItem(s, b);    //To change body of overridden methods use File | Settings | File Templates.
-                        /*
-                        if (b) {
-                            setText(null);
-                            setGraphic(null);
-                        }
-                         */
-                        if (s != null) {
+                    protected void updateItem(String s, boolean empty) {
+                        super.updateItem(s, empty);    //To change body of overridden methods use File | Settings | File Templates.
+                        if (!empty) {
                             String color = s.split(" ")[1].split("@")[1];
                                 setStyle("-fx-text-fill: " + color);
-                                //setGraphic();
                                 setText(s);
+                                
                         }
                     }
                 };
