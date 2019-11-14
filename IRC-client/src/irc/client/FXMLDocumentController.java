@@ -90,8 +90,9 @@ public class FXMLDocumentController {
     private ListView<String> messageList;
 
     void appendMessages(String message) {
-        this.messageList.getItems().add(message);
-        //System.out.println(this.messageList.getItems());
+        if (message.charAt(0) != '$') {
+            this.messageList.getItems().add(message);
+        }
     }
 
     @FXML
@@ -165,9 +166,9 @@ public class FXMLDocumentController {
                         super.updateItem(s, empty);    //To change body of overridden methods use File | Settings | File Templates.
                         if (!empty) {
                             String color = s.split(" ")[1].split("@")[1];
-                                setStyle("-fx-text-fill: " + color);
-                                setText(s);
-                                
+                            setStyle("-fx-text-fill: " + color);
+                            setText(s);
+
                         }
                     }
                 };
