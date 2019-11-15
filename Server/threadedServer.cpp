@@ -7,11 +7,19 @@
 
 class room;
 class user;
+/*
+    Funkcja wysyłająca do wszystkich userów podłączonych do pokoju
+    informacje z listą obecnie podłączonych użytkowników
+*/
 void send_actual_user_list(thread_data_t * th_data){
     char * message = th_data->room_list[th_data->room_index].get_user_list();
     th_data->room_list[th_data->room_index].send_to_everyone(message);
     delete message;
 }
+/*
+    Funkcja iterując się po liście pokojów tworzy z ich nazw listę,
+    która jest następnie wysyłana do wszystkich userów podłączonych do serwera.
+*/
 void send_actual_room_list(thread_data_t * th_data){
     char * buff = new char [BUFF_SIZE];
         memset(buff,'\0',sizeof(char)*BUFF_SIZE);
@@ -31,17 +39,26 @@ void send_actual_room_list(thread_data_t * th_data){
         
         delete buff;
 }
-//funkcja opisującą zachowanie wątku - musi przyjmować argument typu (void *) i zwracać (void *)
+/*
+    command number list:
+    0-wykrycie $leave -rozlaczenie z serwerem
+    1-wykrycie $join -stworzenie/dolaczenie do kanalu
+    2-wykrycie $username x -zmiana username'u na x
+    3-wykrycie $color y -zmiana koloru username'u osoby na y
+    4-wykrycie $room_list -wyslanie do klienta informacji o liscie pokoi
+    5-wykrycie $user_list -wyslanie do klient informacji o liscie user'ow podlaczonych do pokoju
+*/
 void *ThreadBehavior(void *t_data)
 {
     pthread_detach(pthread_self());
-    bool connected=true;
-    thread_data_t *th_data = (thread_data_t*)t_data;
-    char * buffor;
-    send_actual_user_list(th_data);
+    bool connected=true;                             //zmienna warunkujaca petle while - przechowuje informacje czy klient jest podlaczony
+    thread_data_t *th_data = (thread_data_t*)t_data; //rzutowanie z typu void* na thread_data_t*
+    char * buffor;                                  //zmienna wskaźnikowa wskazujaca na miejsce w pamieci, gdzie bedzie przechowywana otrzymana od usera wiadomosc
+    send_actual_user_list(th_data); 
+    send_actual_room_list(th_data);                 //wyslanie informacji o liscie userow w pokoju deafault'owym oraz liscie kanalow
     while(connected)
     {
-        buffor=reading_message(th_data->connection_socket_descriptor,&connected);
+        buffor=reading_message(th_data->connection_socket_descriptor,&connected);//
         int command_number = command_detection(buffor,th_data->command);
         if(command_number==0){
             connected=false;
@@ -144,6 +161,12 @@ void *ThreadBehavior(void *t_data)
             delete message;
             
         }
+        /*
+            rozeslanie wiadomosci po pokoju pod warunkiem,
+            ze user jest nadal polaczony i jego wiadomosc nie zostala uznana jako komenda
+            format wiadomosci:
+            HH::MM::SS username@color message
+        */
         if(connected && command_number==-1)
         {
             time_t rawtime;
@@ -163,17 +186,23 @@ void *ThreadBehavior(void *t_data)
             th_data->room_list[th_data->room_index].send_to_everyone(formatted_message);
             delete formatted_message;
         }
+        /*
+            rozlaczanie uzytkownika pod warunkiem
+            ze jego wiadomosc zostala wykryta jako komenda $leave 
+            lub connected zostalo ustawione na wartosc false.
+            Po usunieciu uzytkownika zostaje rozeslana wiadomosc o aktualnej liscie uzytkownikow pokoju.
+        */
         else if(command_number==0 || !connected)
         {
             printf("Uzytkownik podlaczony do socketu %d rozlaczyl sie!\n",th_data->connection_socket_descriptor);
             th_data->room_list[th_data->room_index].remove_user(th_data->connection_socket_descriptor);
             send_actual_user_list(th_data);
         }
-        delete buffor;
+        delete buffor;      //zwalnianie pamieci zajmowanej przez buffor
     }
-    close(th_data->connection_socket_descriptor);
-    delete th_data;
-    pthread_exit(NULL);
+    close(th_data->connection_socket_descriptor);           //zamykanie polaczenia na sockecie
+    delete th_data;                                         //zwalnianie pamieci zajmowanej przez zmienna przekazywana do watku
+    pthread_exit(NULL);                                     //wychodzenie z watku    
 }
 
 //funkcja obsługująca połączenie z nowym klientem
@@ -200,31 +229,31 @@ void handleConnection(int connection_socket_descriptor,char ** command,room * ro
 
 int main(int argc, char* argv[])
 {
-   room * room_list = new room[MAX_ROOMS];
-   char ** command = new char * [COMMAND_ARRAY_SIZE];
-    for (int i = 0; i<COMMAND_ARRAY_SIZE;i++)
+   room * room_list = new room[MAX_ROOMS];              //deklarowanie zmiennej wskaznikowej wskazujacej na liste pokoi
+   char ** command = new char * [COMMAND_ARRAY_SIZE];   //deklarowanie zmiennej wskaznikowej wskazujacej na liste polecen
+   for (int i = 0; i<COMMAND_ARRAY_SIZE;i++)
         {
             command[i]=new char [15];
         }
     strcpy(command[0],"$leave");
     strcpy(command[1],"$join ");
-    strcpy(command[2],"$username ");
+    strcpy(command[2],"$username ");                    //wpisywanie listy kommend pod zadane adresy
     strcpy(command[3],"$color ");
     strcpy(command[4],"$room_list");
     strcpy(command[5],"$user_list");
-   int server_socket_descriptor;
-   int connection_socket_descriptor;
-   int bind_result;
-   int listen_result;
-   char reuse_addr_val = 1;
-   pthread_mutex_t room_list_mutex;
-   int mutex_room_list_init_result = pthread_mutex_init(&room_list_mutex,NULL);
+   int server_socket_descriptor;                        //zmienna przechowujaca socket descriptor serwera
+   int connection_socket_descriptor;                    //zmienna przechowujaca socket descriptor usera
+   int bind_result;                                     //zmienna przechowujaca wynik operacji bind
+   int listen_result;                                   //zmienna przechowujaca wynik operacji result
+   char reuse_addr_val = 1;                             
+   pthread_mutex_t room_list_mutex;                     //mutex, ktory bedzie chronil przed wspolbiezna modyfikacja listy pokoi
+   int mutex_room_list_init_result = pthread_mutex_init(&room_list_mutex,NULL); // inicjalizacja mutexa z odczytywaniem ewentualnych bledow
         if (mutex_room_list_init_result < 0)
         {
             fprintf(stderr, "Błąd przy próbie zainicjalizowania mutexa");
             exit(1);
         }
-   struct sockaddr_in server_address;
+   struct sockaddr_in server_address;                   
 
    //inicjalizacja gniazda serwera
    memset(&server_address, 0, sizeof(struct sockaddr));
@@ -267,7 +296,7 @@ int main(int argc, char* argv[])
    }
    for (int i = 0; i<COMMAND_ARRAY_SIZE;i++)
         delete command[i];
-   delete []command;
+   delete []command;                            //uwalnianie pamieci
    delete []room_list;
    close(server_socket_descriptor);
    return(0);
