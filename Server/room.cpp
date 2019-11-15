@@ -6,28 +6,30 @@
     };
     void room::change_username(int connection_socket_descriptor,char * username){
         this->lock_user_list_mutex();
-        int userIndex;
+        int user_index=-1;
         for (int i=0;i<MAX_USERS_CONNECTED_TO_CHANNEL;i++){
             if(this->user_list[i].get_socket_description_id()==connection_socket_descriptor)
                 {
-                    userIndex=i;
+                    user_index=i;
                     break;
                 }
         }
-        this->user_list[userIndex].set_username(username);
+        if(user_index!=-1)
+        this->user_list[user_index].set_username(username);
         this->unlock_user_list_mutex();
     };
     void room::change_color(int connection_socket_descriptor,char * color){
         this->lock_user_list_mutex();
-        int userIndex;
+        int user_index=-1;
         for (int i=0;i<MAX_USERS_CONNECTED_TO_CHANNEL;i++){
             if(this->user_list[i].get_socket_description_id()==connection_socket_descriptor)
                 {
-                    userIndex=i;
+                    user_index=i;
                     break;
                 }
         }
-        this->user_list[userIndex].set_color(color);
+        if(user_index!=-1)
+        this->user_list[user_index].set_color(color);
         this->unlock_user_list_mutex();
     };
     void room::remove_user(int socket_descriptor){
@@ -68,8 +70,8 @@
         return add_result;
     };
     char * room::get_user_list(){
-       char *  buffor = new char [BUFF_SIZE];
-       memset(buffor,'\0',BUFF_SIZE);
+       char *  buffor = new char [BUFF_SIZE-1];
+       memset(buffor,'\0',BUFF_SIZE-1);
        strcpy(buffor,"$user_list ");
        this->lock_user_list_mutex();
        for (int i=0;i<MAX_USERS_CONNECTED_TO_CHANNEL;i++){

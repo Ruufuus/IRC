@@ -29,10 +29,11 @@ char * reading_message(int connection_socket_descriptor,bool * connected){
     odczytuje po jednym znaku, az nie natrafi na znak nowej linii
     Funkcja dodatkowo wykrywa czy uzytkownik sie nie rozlaczyl
     */
-    char * buffor = new char[BUFF_SIZE];
-    char * temp = new char;
+    char * buffor = new char[BUFF_SIZE-1];
+    char * temp = new char[2];
     int read_result;
-    memset(buffor,'\0',sizeof(char)*BUFF_SIZE);
+    memset(buffor,'\0',sizeof(char)*BUFF_SIZE-1);
+    memset(temp,'\0',2);
     do{
         read_result=read(connection_socket_descriptor,temp,1);
         if(read_result<0)

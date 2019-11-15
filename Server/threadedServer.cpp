@@ -21,23 +21,25 @@ void send_actual_user_list(thread_data_t * th_data){
     która jest następnie wysyłana do wszystkich userów podłączonych do serwera.
 */
 void send_actual_room_list(thread_data_t * th_data){
-    char * buff = new char [BUFF_SIZE];
-        memset(buff,'\0',sizeof(char)*BUFF_SIZE);
-        strcpy(buff,"$room_list ");
-        for(int i=0;i<MAX_ROOMS;i++){
-            if(!th_data->room_list[i].get_if_alive())
-                continue;
-            strcat(buff,th_data->room_list[i].get_room_name().c_str());
-            strcat(buff," ");
-        }
-        strcat(buff,"\n");
-        for(int i=0;i<MAX_ROOMS;i++){
-            if(!th_data->room_list[i].get_if_alive())
-                continue;
-            th_data->room_list[i].send_to_everyone(buff);
-        }
-        
-        delete buff;
+    char * buff = new char [BUFF_SIZE-1];
+    memset(buff,'\0',sizeof(char)*BUFF_SIZE-1);
+    strcpy(buff,"$room_list ");
+    pthread_mutex_lock(&(th_data->room_list_mutex));
+    for(int i=0;i<MAX_ROOMS;i++){
+        if(!th_data->room_list[i].get_if_alive())
+            continue;
+        strcat(buff,th_data->room_list[i].get_room_name().c_str());
+        strcat(buff," ");
+    }
+    pthread_mutex_unlock(&(th_data->room_list_mutex));
+    strcat(buff,"\n");
+    for(int i=0;i<MAX_ROOMS;i++){
+        if(!th_data->room_list[i].get_if_alive())
+            continue;
+        th_data->room_list[i].send_to_everyone(buff);
+    }
+    
+    delete buff;
 }
 /*
     Funkcja wyszukuje pokoju o nazwie podanej w zmiennej buffor,
@@ -90,8 +92,7 @@ void creating_channel(thread_data_t *th_data, char* buffor){
             th_data->room_list[th_data->room_index].remove_user(th_data->connection_socket_descriptor); //usuniecie uzytkownika z poprzedniego pokoju
             send_actual_user_list(th_data); //poinformowanie uzytkownikow pokoju o opuszczeniu usera
             th_data->room_index=i;          //zmienienia room_indexu
-            czy_stworzono=true;             
-            send_actual_room_list(th_data);//poinformowanie uzytkownikow serwera o dodaniu pokoju
+            czy_stworzono=true;
             printf("User polaczony na sockecie %d stworzyl kanal %s\n",th_data->connection_socket_descriptor,buffor);
             break;
         }
@@ -106,6 +107,9 @@ void creating_channel(thread_data_t *th_data, char* buffor){
         th_data->room_list[th_data->room_index].sending_mutex_unlock();
         delete error;
         printf("User'owi polaczonemu na sockecie %d nie udalo sie dolaczyc do kanalu llub go stworzyc\n",th_data->connection_socket_descriptor);
+    }
+    else{
+            send_actual_room_list(th_data);//poinformowanie uzytkownikow serwera o dodaniu pokoju
     }
 }
 /*
@@ -135,23 +139,23 @@ void color_command(thread_data_t * th_data,char * buffor){
     Funkcja obslugujaca wykrycie komendy $room_list
 */
 void room_list_command(thread_data_t * th_data){
-            char * buff = new char [BUFF_SIZE];
-            memset(buff,'\0',sizeof(char)*BUFF_SIZE);
-            strcpy(buff,"$room_list ");
-            pthread_mutex_lock(&(th_data->room_list_mutex));
-            for(int i=0;i<MAX_ROOMS;i++){
-                if(!th_data->room_list[i].get_if_alive())
-                    continue;
-                strcat(buff,th_data->room_list[i].get_room_name().c_str());
-                strcat(buff," ");
-            }
-            strcat(buff,"\n\0");
-            pthread_mutex_unlock(&(th_data->room_list_mutex));
-            th_data->room_list[th_data->room_index].sending_mutex_lock();
-            sending_message(th_data->connection_socket_descriptor,buff);
-            th_data->room_list[th_data->room_index].sending_mutex_unlock();
-            
-            delete buff;
+    char * buff = new char [BUFF_SIZE-1];
+    memset(buff,'\0',sizeof(char)*BUFF_SIZE-1);
+    strcpy(buff,"$room_list ");
+    pthread_mutex_lock(&(th_data->room_list_mutex));
+    for(int i=0;i<MAX_ROOMS;i++){
+        if(!th_data->room_list[i].get_if_alive())
+            continue;
+        strcat(buff,th_data->room_list[i].get_room_name().c_str());
+        strcat(buff," ");
+    }
+    strcat(buff,"\n\0");
+    pthread_mutex_unlock(&(th_data->room_list_mutex));
+    th_data->room_list[th_data->room_index].sending_mutex_lock();
+    sending_message(th_data->connection_socket_descriptor,buff);
+    th_data->room_list[th_data->room_index].sending_mutex_unlock();
+    
+    delete buff;
 }
 /*
     Funkcja obslugujaca wykrycie komendy $user_list
@@ -168,13 +172,13 @@ void user_list_command(thread_data_t * th_data){
     aby byla zrozumiala dla klienta
 */
 char * formatting_message(thread_data_t *th_data,char * buffor){
-    char * formatted_message = new char [BUFF_SIZE];
-    memset(formatted_message,'\0',sizeof(char)*BUFF_SIZE);
+    char * formatted_message = new char [BUFF_SIZE-1];
+    memset(formatted_message,'\0',sizeof(char)*BUFF_SIZE-1);
     time_t rawtime;
     struct tm * timeinfo;
     time (&rawtime);
     timeinfo = localtime(&rawtime);
-    strftime(formatted_message,BUFF_SIZE,"%H:%M:%S ",timeinfo);
+    strftime(formatted_message,BUFF_SIZE-1,"%H:%M:%S ",timeinfo);
     user temp_user = th_data->room_list[th_data->room_index].get_user(th_data->connection_socket_descriptor);
     strcat(formatted_message,temp_user.get_username().c_str());
     strcat(formatted_message,"@");
@@ -198,11 +202,13 @@ void *ThreadBehavior(void *t_data)
     bool connected=true;                             //zmienna warunkujaca petle while - przechowuje informacje czy klient jest podlaczony
     thread_data_t *th_data = (thread_data_t*)t_data; //rzutowanie z typu void* na thread_data_t*
     char * buffor;                                  //zmienna wskaźnikowa wskazujaca na miejsce w pamieci, gdzie bedzie przechowywana otrzymana od usera wiadomosc
+    user new_user(th_data->connection_socket_descriptor);
+    th_data->room_list[0].add_user(new_user);
     send_actual_user_list(th_data); 
     send_actual_room_list(th_data);                 //wyslanie informacji o liscie userow w pokoju deafault'owym oraz liscie kanalow
     while(connected)
     {
-        buffor=reading_message(th_data->connection_socket_descriptor,&connected);//
+        buffor=reading_message(th_data->connection_socket_descriptor,&connected);
         int command_number = command_detection(buffor,th_data->command);
         switch(command_number){
         case 0:
@@ -265,8 +271,6 @@ void handleConnection(int connection_socket_descriptor,char ** command,room * ro
     //uchwyt na wątek
     pthread_t thread1;
     thread_data_t* t_data=new thread_data_t;
-    user new_user(connection_socket_descriptor);
-    room_list[0].add_user(new_user);
     t_data->connection_socket_descriptor=connection_socket_descriptor;          //wypelnianie pol struktury przekazywanej do watku
     t_data->command=command;
     t_data->room_list=room_list;
