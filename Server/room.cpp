@@ -4,8 +4,34 @@
     {
         this->room_name=room_name;
     };
+    void room::change_username(int connection_socket_descriptor,char * username){
+        this->lock_user_list_mutex();
+        int userIndex;
+        for (int i=0;i<MAX_USERS_CONNECTED_TO_CHANNEL;i++){
+            if(this->user_list[i].get_socket_description_id()==connection_socket_descriptor)
+                {
+                    userIndex=i;
+                    break;
+                }
+        }
+        this->user_list[userIndex].set_username(username);
+        this->unlock_user_list_mutex();
+    };
+    void room::change_color(int connection_socket_descriptor,char * color){
+        this->lock_user_list_mutex();
+        int userIndex;
+        for (int i=0;i<MAX_USERS_CONNECTED_TO_CHANNEL;i++){
+            if(this->user_list[i].get_socket_description_id()==connection_socket_descriptor)
+                {
+                    userIndex=i;
+                    break;
+                }
+        }
+        this->user_list[userIndex].set_color(color);
+        this->unlock_user_list_mutex();
+    };
     void room::remove_user(int socket_descriptor){
-        pthread_mutex_lock(&(this->room_user_list_mutex));
+        this->lock_user_list_mutex();
         for (int i=0;i<MAX_USERS_CONNECTED_TO_CHANNEL;i++){
             if(this->user_list[i].get_socket_description_id()==socket_descriptor)
                 {
@@ -21,7 +47,7 @@
                     break;
                 }
         }
-        pthread_mutex_unlock(&(this->room_user_list_mutex));
+        this->unlock_user_list_mutex();
     };
     bool room::get_if_alive(){
         return this->room_alive;
@@ -59,7 +85,7 @@
                 }
         } 
         this->unlock_user_list_mutex();
-        strcat(buffor,"\n");
+        strcat(buffor,"\n\0");
         return buffor;
     };
     int room::get_user_sd(int index){

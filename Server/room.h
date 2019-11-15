@@ -11,6 +11,8 @@ class room{
         user * user_list;
         bool room_alive;
     public:
+        void change_username(int socket_descriptor,char * username);
+        void change_color(int socket_descriptor,char * username);
         void send_to_everyone(char * buffor);
         void lock_user_list_mutex();
         void unlock_user_list_mutex();
