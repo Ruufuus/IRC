@@ -213,7 +213,7 @@ void *ThreadBehavior(void *t_data)
     th_data->room_list[0].add_user(new_user);
     send_actual_user_list(th_data); 
     send_actual_room_list(th_data);                 //wyslanie informacji o liscie userow w pokoju deafault'owym oraz liscie kanalow
-    while(connected)
+    while(connected && *(th_data->is_server_alive))
     {
         buffor=reading_message(th_data->connection_socket_descriptor,&connected);   //odczytanie wiadomosci i zapisanie jej w zmiennej buffor
         int command_number = command_detection(buffor,th_data->command);            
@@ -271,7 +271,7 @@ void *ThreadBehavior(void *t_data)
 }
 
 //funkcja obsługująca połączenie z nowym klientem
-void handleConnection(int connection_socket_descriptor,char ** command,room * room_list,pthread_mutex_t room_list_mutex) {
+void handleConnection(int connection_socket_descriptor,char ** command,room * room_list,pthread_mutex_t room_list_mutex,bool * is_server_alive) {
     //wynik funkcji tworzącej wątek
     int create_result = 0;
 
@@ -283,13 +283,30 @@ void handleConnection(int connection_socket_descriptor,char ** command,room * ro
     t_data->room_list=room_list;
     t_data->room_index=0;
     t_data->room_list_mutex=room_list_mutex;
+    t_data->is_server_alive=is_server_alive;
     create_result = pthread_create(&thread1, NULL, ThreadBehavior, (void *)t_data);     //tworzenie watku z obsluga bledu
     if (create_result){
     printf("Błąd przy próbie utworzenia wątku, kod błędu: %d\n", create_result);
     exit(-1);
     }
 }
+void *server_off(void * is_server_alive_)
+{
+    pthread_detach(pthread_self());
+    bool *is_server_alive = (bool*)is_server_alive_;  
+    char * buffor = new char [BUFF_SIZE];
+        while(*is_server_alive){
+        fgets(buffor,BUFF_SIZE,stdin);
+        if(!strncmp(buffor,"stop",strlen("stop")))
+        {
+            printf("Trwa wylaczanie serwera!\n");
+            *is_server_alive=false;
+        }     
+    }
+    exit(-1);  
+    
 
+}
 int main(int argc, char* argv[])
 {
    room * room_list = new room[MAX_ROOMS];              //deklarowanie zmiennej wskaznikowej wskazujacej na liste pokoi
@@ -310,6 +327,11 @@ int main(int argc, char* argv[])
    int listen_result;                                   //zmienna przechowujaca wynik operacji result
    char reuse_addr_val = 1;                             
    pthread_mutex_t room_list_mutex;                     //mutex, ktory bedzie chronil przed wspolbiezna modyfikacja listy pokoi
+   pthread_t thread1;
+   thread_data_t* t_data=new thread_data_t;
+   bool * is_server_alive=new bool;
+   *is_server_alive=true;
+   t_data->is_server_alive=is_server_alive;
    int mutex_room_list_init_result = pthread_mutex_init(&room_list_mutex,NULL); // inicjalizacja mutexa z odczytywaniem ewentualnych bledow
         if (mutex_room_list_init_result < 0)
         {
@@ -344,8 +366,12 @@ int main(int argc, char* argv[])
        fprintf(stderr, "%s: Błąd przy próbie ustawienia wielkości kolejki.\n", argv[0]);
        exit(1);
    }
-
-   while(1)
+    int create_result = pthread_create(&thread1, NULL, server_off, (void *)is_server_alive);     //tworzenie watku z obsluga bledu
+    if (create_result){
+    printf("Błąd przy próbie utworzenia wątku, kod błędu: %d\n", create_result);
+    exit(-1);
+    }
+   while(*is_server_alive)
    {
        connection_socket_descriptor = accept(server_socket_descriptor, NULL, NULL);
        printf("Nastąpiło połączenie na sockecie: %d\n",connection_socket_descriptor);
@@ -355,7 +381,7 @@ int main(int argc, char* argv[])
            exit(1);
        }
 
-       handleConnection(connection_socket_descriptor,command,room_list,room_list_mutex);
+       handleConnection(connection_socket_descriptor,command,room_list,room_list_mutex,is_server_alive);
    }
    for (int i = 0; i<COMMAND_ARRAY_SIZE;i++)
         delete command[i];
