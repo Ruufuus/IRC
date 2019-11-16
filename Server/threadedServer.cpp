@@ -211,11 +211,22 @@ void *ThreadBehavior(void *t_data)
     char * buffor;                                  //zmienna wskaźnikowa wskazujaca na miejsce w pamieci, gdzie bedzie przechowywana otrzymana od usera wiadomosc
     user new_user(th_data->connection_socket_descriptor);
     th_data->room_list[0].add_user(new_user);
+    pthread_mutex_lock(&(th_data->csd_array_mutex));
+    for(int i = 0; i < MAX_USERS_CONNECTED_TO_CHANNEL*MAX_ROOMS;i++){
+        if(th_data->connection_descriptor_array[i]==-1){
+            th_data->connection_descriptor_array[i]=th_data->connection_socket_descriptor;
+            break;
+        }
+    }
+    pthread_mutex_unlock(&(th_data->csd_array_mutex));
     send_actual_user_list(th_data); 
     send_actual_room_list(th_data);                 //wyslanie informacji o liscie userow w pokoju deafault'owym oraz liscie kanalow
     while(connected && *(th_data->is_server_alive))
     {
         buffor=reading_message(th_data->connection_socket_descriptor,&connected);   //odczytanie wiadomosci i zapisanie jej w zmiennej buffor
+        if (!buffor){
+            break;
+            }
         int command_number = command_detection(buffor,th_data->command);            
         switch(command_number){          
         case 0:
@@ -257,7 +268,7 @@ void *ThreadBehavior(void *t_data)
             lub connected zostalo ustawione na wartosc false.
             Po usunieciu uzytkownika zostaje rozeslana wiadomosc o aktualnej liscie uzytkownikow pokoju.
         */
-        else if(command_number==0 || !connected)
+        else if(!connected)
         {
             printf("Uzytkownik podlaczony do socketu %d rozlaczyl sie!\n",th_data->connection_socket_descriptor);
             th_data->room_list[th_data->room_index].remove_user(th_data->connection_socket_descriptor);
@@ -265,13 +276,22 @@ void *ThreadBehavior(void *t_data)
         }
         delete buffor;      //zwalnianie pamieci zajmowanej przez buffor
     }
-    close(th_data->connection_socket_descriptor);           //zamykanie polaczenia na sockecie
+    pthread_mutex_lock(&(th_data->csd_array_mutex));
+    for(int i = 0; i < MAX_USERS_CONNECTED_TO_CHANNEL*MAX_ROOMS;i++){
+        if(th_data->connection_descriptor_array[i]==th_data->connection_socket_descriptor){
+            th_data->connection_descriptor_array[i]=-1;
+            break;
+        }
+    }
+    pthread_mutex_unlock(&(th_data->csd_array_mutex));
+    close(th_data->connection_socket_descriptor);             //zamykanie polaczenia na sockecie
+    printf("Zakonczono poleczenie na sockecie %d!\n",th_data->connection_socket_descriptor);         
     delete th_data;                                         //zwalnianie pamieci zajmowanej przez zmienna przekazywana do watku
     pthread_exit(NULL);                                     //wychodzenie z watku    
 }
 
 //funkcja obsługująca połączenie z nowym klientem
-void handleConnection(int connection_socket_descriptor,char ** command,room * room_list,pthread_mutex_t room_list_mutex,bool * is_server_alive) {
+void handleConnection(int connection_socket_descriptor,char ** command,room * room_list,pthread_mutex_t room_list_mutex,bool * is_server_alive,pthread_mutex_t csd_array_mutex,int * connection_descriptor_array) {
     //wynik funkcji tworzącej wątek
     int create_result = 0;
 
@@ -284,6 +304,8 @@ void handleConnection(int connection_socket_descriptor,char ** command,room * ro
     t_data->room_index=0;
     t_data->room_list_mutex=room_list_mutex;
     t_data->is_server_alive=is_server_alive;
+    t_data->csd_array_mutex=csd_array_mutex;
+    t_data->connection_descriptor_array=connection_descriptor_array;
     create_result = pthread_create(&thread1, NULL, ThreadBehavior, (void *)t_data);     //tworzenie watku z obsluga bledu
     if (create_result){
     printf("Błąd przy próbie utworzenia wątku, kod błędu: %d\n", create_result);
@@ -303,12 +325,18 @@ void *server_off(void * is_server_alive_)
             *is_server_alive=false;
         }     
     }
-    exit(-1);  
+    pthread_exit(NULL);  
     
 
 }
 int main(int argc, char* argv[])
 {
+    if (argc != 2)
+   {
+     fprintf(stderr, "Sposób użycia: ./server.exe port_number\n");
+     exit(1);
+   }
+   int server_port=atoi(argv[1]);
    room * room_list = new room[MAX_ROOMS];              //deklarowanie zmiennej wskaznikowej wskazujacej na liste pokoi
    char ** command = new char * [COMMAND_ARRAY_SIZE];   //deklarowanie zmiennej wskaznikowej wskazujacej na liste polecen
    for (int i = 0; i<COMMAND_ARRAY_SIZE;i++)
@@ -325,9 +353,14 @@ int main(int argc, char* argv[])
    int connection_socket_descriptor;                    //zmienna przechowujaca socket descriptor usera
    int bind_result;                                     //zmienna przechowujaca wynik operacji bind
    int listen_result;                                   //zmienna przechowujaca wynik operacji result
+   int flags;                                           //zmienna przechowujaca flagi deskryptora serwera
+   int fcntl_result;                                    //zmienna przechowujaca wynik operacji fcntl
+   int * connection_descriptor_array = new int [MAX_ROOMS*MAX_USERS_CONNECTED_TO_CHANNEL];
+   memset(connection_descriptor_array,-1,MAX_ROOMS*MAX_USERS_CONNECTED_TO_CHANNEL*sizeof(int));
    char reuse_addr_val = 1;                             
    pthread_mutex_t room_list_mutex;                     //mutex, ktory bedzie chronil przed wspolbiezna modyfikacja listy pokoi
    pthread_t thread1;
+   pthread_mutex_t csd_array_mutex;
    thread_data_t* t_data=new thread_data_t;
    bool * is_server_alive=new bool;
    *is_server_alive=true;
@@ -338,18 +371,30 @@ int main(int argc, char* argv[])
             fprintf(stderr, "Błąd przy próbie zainicjalizowania mutexa");
             exit(1);
         }
+    int mutex_csd_array_init_result = pthread_mutex_init(&csd_array_mutex,NULL);
+    if (mutex_csd_array_init_result < 0)
+        {
+            fprintf(stderr, "Błąd przy próbie zainicjalizowania mutexa");
+            exit(1);
+        }
    struct sockaddr_in server_address;                   
 
    //inicjalizacja gniazda serwera
    memset(&server_address, 0, sizeof(struct sockaddr));
    server_address.sin_family = AF_INET;
    server_address.sin_addr.s_addr = htonl(INADDR_ANY);
-   server_address.sin_port = htons(SERVER_PORT);
+   server_address.sin_port = htons(server_port);
 
    server_socket_descriptor = socket(AF_INET, SOCK_STREAM, 0);
    if (server_socket_descriptor < 0)
    {
        fprintf(stderr, "%s: Błąd przy próbie utworzenia gniazda..\n", argv[0]);
+       exit(1);
+   }
+   flags = fcntl(server_socket_descriptor,F_GETFL);
+   fcntl_result = fcntl(server_socket_descriptor, F_SETFL, flags | O_NONBLOCK);
+   if(fcntl_result<0){
+       fprintf(stderr, "%s: Blad przy ustawianiu flag deskryptora serwera..\n", argv[0]);
        exit(1);
    }
    setsockopt(server_socket_descriptor, SOL_SOCKET, SO_REUSEADDR, (char*)&reuse_addr_val, sizeof(reuse_addr_val));
@@ -374,20 +419,38 @@ int main(int argc, char* argv[])
    while(*is_server_alive)
    {
        connection_socket_descriptor = accept(server_socket_descriptor, NULL, NULL);
-       printf("Nastąpiło połączenie na sockecie: %d\n",connection_socket_descriptor);
-       if (connection_socket_descriptor < 0)
+       if (connection_socket_descriptor == -1)
        {
-           fprintf(stderr, "%s: Błąd przy próbie utworzenia gniazda dla połączenia.\n", argv[0]);
-           exit(1);
+           if (errno == EWOULDBLOCK)
+           {
+               //printf("Brak nadchodzacych polaczen, usypiam nasluchiwanie na sekunde!\n");
+               sleep(1);
+           }
+           else{
+                fprintf(stderr, "%s: Błąd przy próbie utworzenia gniazda dla połączenia.\n", argv[0]);
+                exit(1);
+           }
        }
-
-       handleConnection(connection_socket_descriptor,command,room_list,room_list_mutex,is_server_alive);
+       else{
+            printf("Nastąpiło połączenie na sockecie: %d\n",connection_socket_descriptor);
+            handleConnection(connection_socket_descriptor,command,room_list,room_list_mutex,is_server_alive,csd_array_mutex,connection_descriptor_array);
+       }
    }
+   pthread_mutex_lock(&(csd_array_mutex));
+   for(int i = 0; i < MAX_USERS_CONNECTED_TO_CHANNEL*MAX_ROOMS;i++){
+        if(connection_descriptor_array[i]!=-1){
+            close(connection_descriptor_array[i]);
+        }
+    }
+   pthread_mutex_unlock(&(csd_array_mutex));
    for (int i = 0; i<COMMAND_ARRAY_SIZE;i++)
         delete command[i];
    delete []command;                            //uwalnianie pamieci
    delete []room_list;
-   pthread_mutex_destroy(&room_list_mutex);
+   delete []connection_descriptor_array;
    close(server_socket_descriptor);
+   pthread_mutex_destroy(&csd_array_mutex);
+   pthread_mutex_destroy(&room_list_mutex);
+   printf("Serwer pomyslnie wylaczono!\n");
    return(0);
 }

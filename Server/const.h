@@ -13,6 +13,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include <poll.h>
 #include <netdb.h>
 #include <signal.h>
 #include <iostream>
@@ -21,3 +22,4 @@
 #include <time.h>
 #include <pthread.h>
 #include <cstring>
+#include <fcntl.h>

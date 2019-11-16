@@ -19,7 +19,6 @@ void sending_message(int connection_socket_descriptor, char * tresc){
         }
     write_result+=current_write_result;
     }while(write_result!=int(strlen(tresc)));
-    
 };
 
 
@@ -34,19 +33,38 @@ char * reading_message(int connection_socket_descriptor,bool * connected){
     int read_result;
     memset(buffor,'\0',sizeof(char)*BUFF_SIZE-1);
     memset(temp,'\0',2);
+    struct pollfd fds;
+    fds.fd=connection_socket_descriptor;
+    fds.events=POLLIN;
+    int poll_result;
     do{
-        read_result=read(connection_socket_descriptor,temp,1);
-        if(read_result<0)
-        {
-            fprintf(stderr, "Błąd przy próbie odczytu wiadomosci");
+        poll_result=poll(&fds,1,1000);
+        if (poll_result<0){
+            fprintf(stderr, "Błąd przy próbie wykorzystania poll'a");
             exit(1);
         }
-        else if(read_result==0){
-            *connected=false;
-            break;
+        else if(poll_result==0){}
+        else{
+            if(fds.revents & POLLIN){
+                do{
+                    read_result=read(connection_socket_descriptor,temp,1);
+                    if(read_result<0)
+                    {
+                        fprintf(stderr, "Błąd przy próbie odczytu wiadomosci");
+                        exit(1);
+                    }
+                    else if(read_result==0){
+                        *connected=false;
+                        break;
+                    }
+                    strcat(buffor,temp);
+                }while(strcmp(temp,"\n"));
+            }
+            else if(fds.revents & POLLNVAL){
+                return NULL;
+            }
         }
-        strcat(buffor,temp);
-    }while(strcmp(temp,"\n"));
+    }while(poll_result == 0);
     delete temp;
     return buffor;
 };
