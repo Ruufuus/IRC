@@ -5,8 +5,8 @@
 #include "message_handling.h"
 #include <pthread.h>
 
-class room;
-class user;
+class room;         //informacja o istnieniu klasy room
+class user;         //informacja o istnieniu klasy user
 /*
     Funkcja wysyłająca do wszystkich userów podłączonych do pokoju
     informacje z listą obecnie podłączonych użytkowników
@@ -113,7 +113,9 @@ void creating_channel(thread_data_t *th_data, char* buffor){
     }
 }
 /*
-    Funkcja obslugujaca wykrycie komendy $join
+    Funkcja obslugujaca wykrycie komendy $join x
+    W momencie gdy pokoj x istnieje sprobuje do niego dolaczyc,
+    a w momencie gdy nie istnieje pokoj x to sprobuje go stworzyc
 */
 void join_command(thread_data_t * th_data,char * buffor){
     bool czy_dolaczono=joining_to_channel(th_data,buffor);
@@ -122,14 +124,16 @@ void join_command(thread_data_t * th_data,char * buffor){
     }
 }
 /*
-    Funkcja obslugujaca wykrycie komendy $username
+    Funkcja obslugujaca wykrycie komendy $username x.
+    Zmienia nick usera na x
 */
 void username_command(thread_data_t * th_data,char * buffor){
     th_data->room_list[th_data->room_index].change_username(th_data->connection_socket_descriptor,buffor);
     send_actual_user_list(th_data);
 }
 /*
-    Funkcja obslugujaca wykrycie komendy $color
+    Funkcja obslugujaca wykrycie komendy $color x
+    Zmienia kolor usera na x
 */
 void color_command(thread_data_t * th_data,char * buffor){
     th_data->room_list[th_data->room_index].change_color(th_data->connection_socket_descriptor,buffor);
@@ -137,6 +141,8 @@ void color_command(thread_data_t * th_data,char * buffor){
 }
 /*
     Funkcja obslugujaca wykrycie komendy $room_list
+    Iteruje sie po liscie pokojow i tworzy z ich nazw liste, 
+    ktora nastepnie jest odsylana do usera.
 */
 void room_list_command(thread_data_t * th_data){
     char * buff = new char [BUFF_SIZE-1];
@@ -158,7 +164,8 @@ void room_list_command(thread_data_t * th_data){
     delete buff;
 }
 /*
-    Funkcja obslugujaca wykrycie komendy $user_list
+    Funkcja obslugujaca wykrycie komendy $user_list.
+    Funckja wysyla do usera liste userow podlaczonych do kanalu
 */
 void user_list_command(thread_data_t * th_data){
     char * message = th_data->room_list[th_data->room_index].get_user_list();
@@ -208,9 +215,9 @@ void *ThreadBehavior(void *t_data)
     send_actual_room_list(th_data);                 //wyslanie informacji o liscie userow w pokoju deafault'owym oraz liscie kanalow
     while(connected)
     {
-        buffor=reading_message(th_data->connection_socket_descriptor,&connected);
-        int command_number = command_detection(buffor,th_data->command);
-        switch(command_number){
+        buffor=reading_message(th_data->connection_socket_descriptor,&connected);   //odczytanie wiadomosci i zapisanie jej w zmiennej buffor
+        int command_number = command_detection(buffor,th_data->command);            
+        switch(command_number){          
         case 0:
             connected=false;
             break;
