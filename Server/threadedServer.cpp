@@ -323,7 +323,11 @@ void *server_off(void * is_server_alive_)
         {
             printf("Trwa wylaczanie serwera!\n");
             *is_server_alive=false;
-        }     
+        }
+        else
+        {
+            printf("Nie rozpoznano polecenia serwera!\n");
+        }
     }
     pthread_exit(NULL);  
     
