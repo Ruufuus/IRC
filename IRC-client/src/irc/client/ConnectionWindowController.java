@@ -55,7 +55,7 @@ public class ConnectionWindowController {
         stage.close();
 
     }
-
+    
     @FXML // This method is called by the FXMLLoader when initialization is complete
     void initialize() {
         assert adresTextField != null : "fx:id=\"adresTextField\" was not injected: check your FXML file 'ConnectionWindow.fxml'.";
