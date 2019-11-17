@@ -109,6 +109,10 @@ public class FXMLDocumentController {
                 stage.setTitle("Zarządzanie Kanałami");
                 stage.setScene(new Scene(root));
                 this.setKanalWindow(true);
+                stage.setOnCloseRequest(action -> {
+                    System.out.println("Stage is closing");
+                    this.setKanalWindow(false);
+                });
                 stage.show();
             }
         } catch (IOException ex) {
@@ -131,6 +135,10 @@ public class FXMLDocumentController {
                 stage.setTitle("Połącz");
                 stage.setScene(new Scene(root));
                 this.setPolaczWindow(true);
+                stage.setOnCloseRequest(action -> {
+                    System.out.println("Stage is closing");
+                    this.setPolaczWindow(false);
+                });
                 stage.show();
             }
         } catch (IOException ex) {
