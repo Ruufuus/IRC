@@ -452,6 +452,7 @@ int main(int argc, char* argv[])
    delete []command;                            //uwalnianie pamieci
    delete []room_list;
    delete []connection_descriptor_array;
+   delete is_server_alive;
    close(server_socket_descriptor);
    pthread_mutex_destroy(&csd_array_mutex);
    pthread_mutex_destroy(&room_list_mutex);
