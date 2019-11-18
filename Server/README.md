@@ -1,4 +1,4 @@
-# **serwer TCP**
+# **serwer TCP obsługujący system chatu typu IRC**
 ## Wymagania do kompilacji i działania serwera.
   - System wspierający API BSD sockets,
   - Zainstalowany kompilator g++
