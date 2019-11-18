@@ -41,4 +41,4 @@
   - stop -wyłącza serwer
 
 ## Format zwykłej wiadomości wysyłanej przez serwer
-  - HH:MM:SS username@color \<message content\>
+  - username@color HH:MM:SS \<message content\>
