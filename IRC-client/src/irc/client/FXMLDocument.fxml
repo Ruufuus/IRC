@@ -25,8 +25,7 @@
           </Menu>
           <Menu mnemonicParsing="false" text="Użytkownik">
             <items>
-              <MenuItem mnemonicParsing="false" text="Zmień nazwę użytkownika" />
-                  <MenuItem mnemonicParsing="false" text="Zmień kolor wiadomości" />
+              <MenuItem mnemonicParsing="false" text="Zarządzaj" />
             </items>
           </Menu>
         </menus>
