@@ -25,7 +25,7 @@
           </Menu>
           <Menu mnemonicParsing="false" text="Użytkownik">
             <items>
-              <MenuItem mnemonicParsing="false" text="Zarządzaj" />
+              <MenuItem fx:id="userSubMenu" mnemonicParsing="false" onAction="#userAction" text="Zarządzaj" />
             </items>
           </Menu>
         </menus>

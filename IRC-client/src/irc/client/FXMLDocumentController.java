@@ -26,6 +26,7 @@ public class FXMLDocumentController {
     private Connection connection = null;
     private boolean polaczWindow = false;
     private boolean kanalWindow = false;
+    private boolean userWindow = false;
     private String username = "username";
 
     /**
@@ -68,6 +69,20 @@ public class FXMLDocumentController {
      */
     public void setKanalWindow(boolean kanalWindow) {
         this.kanalWindow = kanalWindow;
+    }
+    
+    /**
+     * @return the userWindow
+     */
+    public boolean isUserWindow() {
+        return userWindow;
+    }
+
+    /**
+     * @param userWindow the userWindow to set
+     */
+    public void setUserWindow(boolean userWindow) {
+        this.userWindow = userWindow;
     }
     
     /**
@@ -187,6 +202,34 @@ public class FXMLDocumentController {
             messField.clear();
         }
 
+    }
+    
+    @FXML
+    void userAction(ActionEvent event) {
+        try {
+            if (!isUserWindow()) {
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("UserWindow.fxml"));
+                Parent root = fxmlLoader.load();
+
+                UserWindowController userController = fxmlLoader.getController();
+
+                userController.setParentController(this);
+                userController.setUsername(username);
+                userController.getUsernameField().setText(username);
+
+                Stage stage = new Stage();
+                stage.setTitle("Zarządzanie użytkownikiem");
+                stage.setScene(new Scene(root));
+                this.setUserWindow(true);
+                stage.setOnCloseRequest(action -> {
+                    System.out.println("Stage is closing");
+                    this.setUserWindow(false);
+                });
+                stage.show();
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(FXMLDocumentController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     @FXML
