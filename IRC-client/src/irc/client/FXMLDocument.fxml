@@ -24,10 +24,10 @@
                   <MenuItem fx:id="utworzSubMenu" mnemonicParsing="false" onAction="#kanalAction" text="Utwórz" />
             </items>
           </Menu>
-          <Menu mnemonicParsing="false" text="Nazwa użytkownika">
+          <Menu mnemonicParsing="false" text="Użytkownik">
             <items>
-              <MenuItem mnemonicParsing="false" text="Zmień" />
-                  <MenuItem mnemonicParsing="false" text="Zmień kolor" />
+              <MenuItem mnemonicParsing="false" text="Zmień nazwę użytkownika" />
+                  <MenuItem mnemonicParsing="false" text="Zmień kolor wiadomości" />
             </items>
           </Menu>
         </menus>

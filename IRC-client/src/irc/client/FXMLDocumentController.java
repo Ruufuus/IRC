@@ -81,18 +81,20 @@ public class FXMLDocumentController {
     private MenuItem utworzSubMenu;
 
     @FXML
-    private ListView<?> canalList;
+    private ListView<String> canalList;
 
     @FXML
-    private ListView<?> userList;
+    private ListView<String> userList;
 
     @FXML
     private ListView<String> messageList;
 
     void appendMessages(String message) {
-        if (message.charAt(0) != '$') {
-            this.messageList.getItems().add(message);
-        }
+        this.messageList.getItems().add(message);
+    }
+    
+    void commandHandling(String command) {
+        
     }
 
     @FXML
@@ -166,6 +168,30 @@ public class FXMLDocumentController {
         assert userList != null : "fx:id=\"userList\" was not injected: check your FXML file 'FXMLDocument.fxml'.";
         assert messageList != null : "fx:id=\"messageList\" was not injected: check your FXML file 'FXMLDocument.fxml'.";
         messageList.setCellFactory(new Callback<ListView<String>, ListCell<String>>() {
+            @Override
+            public ListCell<String> call(ListView<String> stringListView) {
+                return new ListCell<String>() {
+                    @Override
+                    protected void updateItem(String s, boolean empty) {
+                        super.updateItem(s, empty);    //To change body of overridden methods use File | Settings | File Templates.
+                        if (!empty && s.matches(".*@.*")) {
+                            String color = s.split(" ")[1].split("@")[1];
+                            if(!color.matches("#[a-fA-F0-9]{6}")){
+                                s = s.replace(color, "#ffffff");
+                                color = "#ffffff";
+                            }
+                            setStyle("-fx-text-fill: " + color);
+                            setText(s);
+
+                        } else {
+                             setStyle("-fx-text-fill: #ffffff");
+                            setText(s);
+                        }
+                    }
+                };
+            }
+        });
+        userList.setCellFactory(new Callback<ListView<String>, ListCell<String>>() {
             @Override
             public ListCell<String> call(ListView<String> stringListView) {
                 return new ListCell<String>() {

@@ -13,10 +13,6 @@ import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
-import javafx.concurrent.Task;
-import javafx.scene.text.Font;
-import javafx.scene.text.Text;
-import javafx.scene.text.TextFlow;
 
 /**
  *
@@ -85,7 +81,11 @@ public class Connection implements Runnable {
                     Platform.runLater(new Runnable() {
                         @Override
                         public void run() {
-                            controller.appendMessages(rl);
+                            if (rl.charAt(0) != '$') {
+                                controller.appendMessages(rl);
+                            } else {
+                                controller.commandHandling(rl);
+                            }
                         }
                     });
 
