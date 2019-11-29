@@ -26,6 +26,7 @@ public class FXMLDocumentController {
     private Connection connection = null;
     private boolean polaczWindow = false;
     private boolean kanalWindow = false;
+    private String username = "username";
 
     /**
      * @return the connection
@@ -67,6 +68,20 @@ public class FXMLDocumentController {
      */
     public void setKanalWindow(boolean kanalWindow) {
         this.kanalWindow = kanalWindow;
+    }
+    
+    /**
+     * @return the username
+     */
+    public String getUsername() {
+        return username;
+    }
+
+    /**
+     * @param username the username to set
+     */
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     @FXML
