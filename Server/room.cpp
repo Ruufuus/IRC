@@ -123,7 +123,7 @@
             fprintf(stderr, "Błąd przy próbie zainicjalizowania mutexa");
             exit(1);
         }
-        this->room_name="Default__Room";
+        this->room_name="Default_Room";
         this->user_list = new user[MAX_USERS_CONNECTED_TO_CHANNEL];
         this->room_alive=false;
     };
