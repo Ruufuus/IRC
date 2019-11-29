@@ -23,6 +23,13 @@ import javafx.util.Callback;
 
 public class FXMLDocumentController {
 
+    /**
+     * @return the messageList
+     */
+    public ListView<String> getMessageList() {
+        return messageList;
+    }
+
     private Connection connection = null;
     private boolean polaczWindow = false;
     private boolean kanalWindow = false;
@@ -121,7 +128,7 @@ public class FXMLDocumentController {
     private ListView<String> messageList;
 
     void appendMessages(String message) {
-        this.messageList.getItems().add(message);
+        this.getMessageList().getItems().add(message);
     }
 
     void commandHandling(String command) {
@@ -145,7 +152,7 @@ public class FXMLDocumentController {
     @FXML
     void kanalAction(ActionEvent event) {
         try {
-            if (!isKanalWindow()) {
+            if (!isKanalWindow() && this.connection != null) {
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("CanalWindow.fxml"));
                 Parent root = fxmlLoader.load();
 
@@ -207,7 +214,7 @@ public class FXMLDocumentController {
     @FXML
     void userAction(ActionEvent event) {
         try {
-            if (!isUserWindow()) {
+            if (!isUserWindow() && this.connection != null) {
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("UserWindow.fxml"));
                 Parent root = fxmlLoader.load();
 
@@ -240,8 +247,8 @@ public class FXMLDocumentController {
         assert utworzSubMenu != null : "fx:id=\"utworzSubMenu\" was not injected: check your FXML file 'FXMLDocument.fxml'.";
         assert canalList != null : "fx:id=\"canalList\" was not injected: check your FXML file 'FXMLDocument.fxml'.";
         assert userList != null : "fx:id=\"userList\" was not injected: check your FXML file 'FXMLDocument.fxml'.";
-        assert messageList != null : "fx:id=\"messageList\" was not injected: check your FXML file 'FXMLDocument.fxml'.";
-        messageList.setCellFactory(new Callback<ListView<String>, ListCell<String>>() {
+        assert getMessageList() != null : "fx:id=\"messageList\" was not injected: check your FXML file 'FXMLDocument.fxml'.";
+        getMessageList().setCellFactory(new Callback<ListView<String>, ListCell<String>>() {
             @Override
             public ListCell<String> call(ListView<String> stringListView) {
                 return new ListCell<String>() {

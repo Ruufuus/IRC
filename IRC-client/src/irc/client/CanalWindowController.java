@@ -49,6 +49,7 @@ public class CanalWindowController {
             String message = this.textFieldCanal.getText();
             parentController.getConnection().sendMessage("$join " + message);
             this.textFieldCanal.clear();
+            this.parentController.getMessageList().getItems().clear();
         }
         
         Stage stage = (Stage) this.okCanalButton.getScene().getWindow();
@@ -58,7 +59,7 @@ public class CanalWindowController {
 
     @FXML
     void textFieldCanalAction(ActionEvent event) {
-
+        this.okCanalButtonAction(event);
     }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete

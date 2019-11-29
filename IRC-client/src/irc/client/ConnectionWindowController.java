@@ -57,22 +57,12 @@ public class ConnectionWindowController {
 
     @FXML
     void adresTextFieldAction(ActionEvent event) {
-        this.parentController.setConnection(new Connection(this.adresTextField.getText(), Integer.parseInt(this.portTextField.getText()), parentController));
-
-        new Thread(this.parentController.getConnection()).start();
-        Stage stage = (Stage) this.okConnectionButton.getScene().getWindow();
-        this.parentController.setPolaczWindow(false);
-        stage.close();
+        this.okConnectionButtonAction(event);
     }
 
     @FXML
     void portTextFieldAction(ActionEvent event) {
-        this.parentController.setConnection(new Connection(this.adresTextField.getText(), Integer.parseInt(this.portTextField.getText()), parentController));
-
-        new Thread(this.parentController.getConnection()).start();
-        Stage stage = (Stage) this.okConnectionButton.getScene().getWindow();
-        this.parentController.setPolaczWindow(false);
-        stage.close();
+        this.okConnectionButtonAction(event);
     }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
