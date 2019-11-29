@@ -49,6 +49,7 @@ public class ConnectionWindowController {
         
         if(this.parentController.getConnection() != null){
             this.parentController.getConnection().setRunning(false);
+            this.parentController.getMessageList().getItems().clear();
         }
         this.parentController.setConnection(new Connection(this.adresTextField.getText(), Integer.parseInt(this.portTextField.getText()), parentController));
 
