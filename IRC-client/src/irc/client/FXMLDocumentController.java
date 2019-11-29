@@ -5,6 +5,7 @@ package irc.client;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -94,7 +95,21 @@ public class FXMLDocumentController {
     }
     
     void commandHandling(String command) {
+        if(command.matches("\\$room_list .*")){
+            this.canalList.getItems().clear();
+            
+            for (String canal : Arrays.copyOfRange(command.split(" "), 1, command.split(" ").length) ) {
+                this.canalList.getItems().add(canal);
+            }
+        }
         
+        if(command.matches("\\$user_list.*")){
+            this.userList.getItems().clear();
+            
+            for (String canal : Arrays.copyOfRange(command.split(" "), 1, command.split(" ").length) ) {
+                this.userList.getItems().add(canal);
+            }
+        }
     }
 
     @FXML
@@ -198,12 +213,32 @@ public class FXMLDocumentController {
                     @Override
                     protected void updateItem(String s, boolean empty) {
                         super.updateItem(s, empty);    //To change body of overridden methods use File | Settings | File Templates.
-                        if (!empty) {
-                            String color = s.split(" ")[1].split("@")[1];
+                        if (!empty && s.matches(".*@.*")) {
+                            String color = s.split("@")[1];
+                            if(!color.matches("#[a-fA-F0-9]{6}")){
+                                s = s.replace(color, "#ffffff");
+                                color = "#ffffff";
+                            }
                             setStyle("-fx-text-fill: " + color);
                             setText(s);
 
+                        } else {
+                             setStyle("-fx-text-fill: #ffffff");
+                            setText(s);
                         }
+                    }
+                };
+            }
+        });
+        canalList.setCellFactory(new Callback<ListView<String>, ListCell<String>>() {
+            @Override
+            public ListCell<String> call(ListView<String> stringListView) {
+                return new ListCell<String>() {
+                    @Override
+                    protected void updateItem(String s, boolean empty) {
+                        super.updateItem(s, empty);    //To change body of overridden methods use File | Settings | File Templates.
+                        setStyle("-fx-text-fill: #00FF00");
+                        setText(s);
                     }
                 };
             }

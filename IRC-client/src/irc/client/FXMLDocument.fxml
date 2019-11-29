@@ -32,8 +32,8 @@
           </Menu>
         </menus>
       </MenuBar>
-      <ListView fx:id="canalList" layoutX="14.0" layoutY="37.0" prefHeight="667.0" prefWidth="275.0" style="-fx-background-color: black; -fx-border-color: white;" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="40.0" />
-      <ListView fx:id="userList" layoutX="988.0" layoutY="40.0" prefHeight="660.0" prefWidth="275.0" style="-fx-background-color: black; -fx-border-color: white;" AnchorPane.bottomAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="40.0" />
+      <ListView fx:id="canalList" layoutX="14.0" layoutY="37.0" prefHeight="667.0" prefWidth="275.0" style="-fx-border-color: white; -fx-background-color: black;" stylesheets="@lisStyles.css" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="40.0" />
+      <ListView fx:id="userList" layoutX="988.0" layoutY="40.0" prefHeight="660.0" prefWidth="275.0" style="-fx-background-color: black; -fx-border-color: white;" stylesheets="@lisStyles.css" AnchorPane.bottomAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="40.0" />
       <Text fill="LIME" layoutX="20.0" layoutY="38.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Lista kanałów:" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="25.0" />
       <Text fill="LIME" layoutX="985.0" layoutY="38.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Lista użytkowników na kanale:" AnchorPane.rightAnchor="136.55078125" />
       <ListView fx:id="messageList" layoutX="306.0" layoutY="40.0" prefHeight="589.0" prefWidth="669.0" style="-fx-background-color: black; -fx-border-color: white;" stylesheets="@lisStyles.css" AnchorPane.bottomAnchor="90.0" AnchorPane.leftAnchor="305.0" AnchorPane.rightAnchor="305.0" AnchorPane.topAnchor="40.0" />
