@@ -4,7 +4,7 @@
 #include "thread_data_t.h"
 #include "message_handling.h"
 #include <pthread.h>
-
+#include "server_data_t.h"
 class room;         //informacja o istnieniu klasy room
 class user;         //informacja o istnieniu klasy user
 /*
@@ -312,17 +312,19 @@ void handleConnection(int connection_socket_descriptor,char ** command,room * ro
     exit(-1);
     }
 }
-void *server_off(void * is_server_alive_)
+void *server_off(void * server_data)
 {
     pthread_detach(pthread_self());
-    bool *is_server_alive = (bool*)is_server_alive_;  
+    struct server_data_t *server_data_c = (server_data_t*)server_data;  
     char * buffor = new char [BUFF_SIZE];
-        while(*is_server_alive){
+        while(*(server_data_c->is_server_alive)){
         fgets(buffor,BUFF_SIZE,stdin);
         if(!strncmp(buffor,"stop",strlen("stop")))
         {
             printf("Trwa wylaczanie serwera!\n");
-            *is_server_alive=false;
+            *(server_data_c->is_server_alive)=false;
+            printf("wylaczenie serwera na sockecie %d\n",server_data_c->server_socket_descriptor);
+            close(server_data_c->server_socket_descriptor);
         }
         else
         {
@@ -357,8 +359,6 @@ int main(int argc, char* argv[])
    int connection_socket_descriptor;                    //zmienna przechowujaca socket descriptor usera
    int bind_result;                                     //zmienna przechowujaca wynik operacji bind
    int listen_result;                                   //zmienna przechowujaca wynik operacji result
-   int flags;                                           //zmienna przechowujaca flagi deskryptora serwera
-   int fcntl_result;                                    //zmienna przechowujaca wynik operacji fcntl
    int * connection_descriptor_array = new int [MAX_ROOMS*MAX_USERS_CONNECTED_TO_CHANNEL];
    memset(connection_descriptor_array,-1,MAX_ROOMS*MAX_USERS_CONNECTED_TO_CHANNEL*sizeof(int));
    char reuse_addr_val = 1;                             
@@ -395,12 +395,6 @@ int main(int argc, char* argv[])
        fprintf(stderr, "%s: Błąd przy próbie utworzenia gniazda..\n", argv[0]);
        exit(1);
    }
-   flags = fcntl(server_socket_descriptor,F_GETFL);
-   fcntl_result = fcntl(server_socket_descriptor, F_SETFL, flags | O_NONBLOCK);
-   if(fcntl_result<0){
-       fprintf(stderr, "%s: Blad przy ustawianiu flag deskryptora serwera..\n", argv[0]);
-       exit(1);
-   }
    setsockopt(server_socket_descriptor, SOL_SOCKET, SO_REUSEADDR, (char*)&reuse_addr_val, sizeof(reuse_addr_val));
    printf("Socket serwera: %d\n",server_socket_descriptor);
    bind_result = bind(server_socket_descriptor, (struct sockaddr*)&server_address, sizeof(struct sockaddr));
@@ -415,29 +409,25 @@ int main(int argc, char* argv[])
        fprintf(stderr, "%s: Błąd przy próbie ustawienia wielkości kolejki.\n", argv[0]);
        exit(1);
    }
-    int create_result = pthread_create(&thread1, NULL, server_off, (void *)is_server_alive);     //tworzenie watku z obsluga bledu
+   struct server_data_t * server_data = new struct server_data_t;
+   server_data->is_server_alive=is_server_alive;
+   server_data->server_socket_descriptor=server_socket_descriptor;
+    int create_result = pthread_create(&thread1, NULL, server_off, (void *)server_data);     //tworzenie watku z obsluga bledu
     if (create_result){
     printf("Błąd przy próbie utworzenia wątku, kod błędu: %d\n", create_result);
     exit(-1);
     }
    while(*is_server_alive)
    {
-       connection_socket_descriptor = accept(server_socket_descriptor, NULL, NULL);
-       if (connection_socket_descriptor == -1)
+        connection_socket_descriptor = accept(server_socket_descriptor, NULL, NULL);
+       if (connection_socket_descriptor < 0)
        {
-           if (errno == EWOULDBLOCK)
-           {
-               //printf("Brak nadchodzacych polaczen, usypiam nasluchiwanie na sekunde!\n");
-               sleep(1);
-           }
-           else{
-                fprintf(stderr, "%s: Błąd przy próbie utworzenia gniazda dla połączenia.\n", argv[0]);
-                exit(1);
-           }
+           fprintf(stderr, "%s: Błąd przy próbie utworzenia gniazda dla połączenia.\n", argv[0]);
+           exit(1);
        }
        else{
-            printf("Nastąpiło połączenie na sockecie: %d\n",connection_socket_descriptor);
-            handleConnection(connection_socket_descriptor,command,room_list,room_list_mutex,is_server_alive,csd_array_mutex,connection_descriptor_array);
+       printf("Nastąpiło połączenie na sockecie: %d\n",connection_socket_descriptor);
+        handleConnection(connection_socket_descriptor,command,room_list,room_list_mutex,is_server_alive,csd_array_mutex,connection_descriptor_array);
        }
    }
    pthread_mutex_lock(&(csd_array_mutex));
@@ -453,7 +443,6 @@ int main(int argc, char* argv[])
    delete []room_list;
    delete []connection_descriptor_array;
    delete is_server_alive;
-   close(server_socket_descriptor);
    pthread_mutex_destroy(&csd_array_mutex);
    pthread_mutex_destroy(&room_list_mutex);
    printf("Serwer pomyslnie wylaczono!\n");
