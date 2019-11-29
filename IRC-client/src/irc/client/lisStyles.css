@@ -1,6 +1,28 @@
 .list-view .list-cell:even {
--fx-background-color: black;
+    -fx-background-color: black;
 }
 .list-view .list-cell:odd {
--fx-background-color: black;
+    -fx-background-color: black;
+}
+
+.menu-item {
+    -fx-background-color: black;
+}
+.menu-item .label{
+    -fx-text-fill: lime;
+}
+.menu:hover{
+    -fx-background-color: rgb(51, 51, 51);
+}
+.menu-item:hover{
+    -fx-background-color: rgb(51, 51, 51);
+}
+
+.menu-button:showing{
+    -fx-background-color: rgb(51, 51, 51);
+}
+
+.context-menu {
+    -fx-skin: "com.sun.javafx.scene.control.skin.ContextMenuSkin";
+    -fx-background-color: black;
 }
