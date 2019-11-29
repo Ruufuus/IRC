@@ -46,7 +46,7 @@ public class Connection implements Runnable {
         this.controller = controller;
         try {
             this.clientSocket = new Socket();
-            this.clientSocket.connect(new InetSocketAddress(ip, port), 100);
+            this.clientSocket.connect(new InetSocketAddress(ip, port), 300);
 
             this.running = true;
         } catch (IOException ex) {
@@ -81,7 +81,7 @@ public class Connection implements Runnable {
             }
             try {
                 String readerLine;
-                while ((readerLine = this.reader.readLine()) != null) {
+                while ((readerLine = this.reader.readLine()) != null && running) {
                     System.out.println(readerLine);
                     final String rl = readerLine;
                     Platform.runLater(new Runnable() {
@@ -116,7 +116,9 @@ public class Connection implements Runnable {
     /**
      * @param isRunning the isRunning to set
      */
-    public void setRunning(boolean isRunning) {
+    public void setRunning(boolean isRunning) throws IOException {
+        this.setClientSocket(null);
+        this.writer.close();
         this.running = isRunning;
     }
 }

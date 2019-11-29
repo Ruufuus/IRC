@@ -46,6 +46,10 @@ public class ConnectionWindowController {
 
     @FXML
     void okConnectionButtonAction(ActionEvent event) {
+        
+        if(this.parentController.getConnection() != null){
+            this.parentController.getConnection().setRunning(false);
+        }
         this.parentController.setConnection(new Connection(this.adresTextField.getText(), Integer.parseInt(this.portTextField.getText()), parentController));
 
         new Thread(this.parentController.getConnection()).start();
