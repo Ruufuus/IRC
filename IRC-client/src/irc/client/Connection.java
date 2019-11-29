@@ -9,6 +9,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -43,30 +45,34 @@ public class Connection implements Runnable {
     public Connection(String ip, int port, FXMLDocumentController controller) {
         this.controller = controller;
         try {
-            this.clientSocket = new Socket(ip, port);
+            this.clientSocket = new Socket();
+            this.clientSocket.connect(new InetSocketAddress(ip, port), 100);
+
             this.running = true;
         } catch (IOException ex) {
-            Logger.getLogger(Connection.class.getName()).log(Level.SEVERE, null, ex);
+            this.clientSocket = null;
         }
     }
 
     public void sendMessage(String clientMessage) {
-        new Thread() {
-            @Override
-            public void run() {
-                try {
-                    writer = new PrintWriter(getClientSocket().getOutputStream(), true);
-                    writer.println(clientMessage);
-                } catch (IOException ex) {
-                    Logger.getLogger(Connection.class.getName()).log(Level.SEVERE, null, ex);
+        if (this.clientSocket != null) {
+            new Thread() {
+                @Override
+                public void run() {
+                    try {
+                        writer = new PrintWriter(getClientSocket().getOutputStream(), true);
+                        writer.println(clientMessage);
+                    } catch (IOException ex) {
+                        Logger.getLogger(Connection.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
-            }
-        }.start();
+            }.start();
+        }
     }
 
     @Override
     public void run() {
-        
+
         while (running) {
             try {
                 this.reader = new BufferedReader(new InputStreamReader(getClientSocket().getInputStream()));
@@ -90,7 +96,7 @@ public class Connection implements Runnable {
                     });
 
                     Thread.sleep(10);
-  
+
                 }
             } catch (IOException ex) {
                 System.out.println("Połączenie zakończono");

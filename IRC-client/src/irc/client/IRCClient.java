@@ -40,9 +40,11 @@ public class IRCClient extends Application {
             controller.getConnection().setRunning(false);
 
             try {
-                controller.getConnection().getClientSocket().shutdownInput();
-                controller.getConnection().getClientSocket().shutdownOutput();
-                controller.getConnection().getClientSocket().close();
+                if (controller.getConnection().getClientSocket() != null) {
+                    controller.getConnection().getClientSocket().shutdownInput();
+                    controller.getConnection().getClientSocket().shutdownOutput();
+                    controller.getConnection().getClientSocket().close();
+                }
             } catch (IOException ex) {
                 Logger.getLogger(Connection.class.getName()).log(Level.SEVERE, null, ex);
             }

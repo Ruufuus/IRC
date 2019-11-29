@@ -203,7 +203,6 @@ public class FXMLDocumentController {
     @FXML
     void sendMessage(ActionEvent event) throws IOException {
         if (this.getConnection() != null) {
-            System.out.println(this.messField.getText());
             String message = this.messField.getText();
             this.getConnection().sendMessage(message);
             messField.clear();
