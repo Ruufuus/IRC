@@ -1,7 +1,6 @@
 /**
  * Sample Skeleton for 'ConnectionWindow.fxml' Controller Class
  */
-
 package irc.client;
 
 import java.net.URL;
@@ -13,13 +12,13 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 public class ConnectionWindowController {
-    
+
     private FXMLDocumentController parentController;
-    
-    void setParentController(FXMLDocumentController controller){
+
+    void setParentController(FXMLDocumentController controller) {
         this.parentController = controller;
     }
-    
+
     @FXML // ResourceBundle that was given to the FXMLLoader
     private ResourceBundle resources;
 
@@ -48,14 +47,34 @@ public class ConnectionWindowController {
     @FXML
     void okConnectionButtonAction(ActionEvent event) {
         this.parentController.setConnection(new Connection(this.adresTextField.getText(), Integer.parseInt(this.portTextField.getText()), parentController));
-        
+
         new Thread(this.parentController.getConnection()).start();
         Stage stage = (Stage) this.okConnectionButton.getScene().getWindow();
         this.parentController.setPolaczWindow(false);
         stage.close();
 
     }
-    
+
+    @FXML
+    void adresTextFieldAction(ActionEvent event) {
+        this.parentController.setConnection(new Connection(this.adresTextField.getText(), Integer.parseInt(this.portTextField.getText()), parentController));
+
+        new Thread(this.parentController.getConnection()).start();
+        Stage stage = (Stage) this.okConnectionButton.getScene().getWindow();
+        this.parentController.setPolaczWindow(false);
+        stage.close();
+    }
+
+    @FXML
+    void portTextFieldAction(ActionEvent event) {
+        this.parentController.setConnection(new Connection(this.adresTextField.getText(), Integer.parseInt(this.portTextField.getText()), parentController));
+
+        new Thread(this.parentController.getConnection()).start();
+        Stage stage = (Stage) this.okConnectionButton.getScene().getWindow();
+        this.parentController.setPolaczWindow(false);
+        stage.close();
+    }
+
     @FXML // This method is called by the FXMLLoader when initialization is complete
     void initialize() {
         assert adresTextField != null : "fx:id=\"adresTextField\" was not injected: check your FXML file 'ConnectionWindow.fxml'.";

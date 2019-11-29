@@ -7,8 +7,8 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="300.0" style="-fx-background-color: black;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="irc.client.ConnectionWindowController">
    <children>
-      <TextField fx:id="adresTextField" layoutX="20.0" layoutY="50.0" prefHeight="25.0" prefWidth="236.0" style="-fx-background-color: black; -fx-border-color: white; -fx-text-inner-color: lime;" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" />
-      <TextField fx:id="portTextField" layoutX="20.0" layoutY="105.0" prefHeight="25.0" prefWidth="260.0" style="-fx-background-color: black; -fx-border-color: white; -fx-text-inner-color: lime;" />
+      <TextField fx:id="adresTextField" layoutX="20.0" layoutY="50.0" onAction="#adresTextFieldAction" prefHeight="25.0" prefWidth="236.0" style="-fx-background-color: black; -fx-border-color: white; -fx-text-inner-color: lime;" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" />
+      <TextField fx:id="portTextField" layoutX="20.0" layoutY="105.0" onAction="#portTextFieldAction" prefHeight="25.0" prefWidth="260.0" style="-fx-background-color: black; -fx-border-color: white; -fx-text-inner-color: lime;" />
       <Button fx:id="okConnectionButton" layoutX="24.0" layoutY="146.0" mnemonicParsing="false" onAction="#okConnectionButtonAction" prefHeight="40.0" prefWidth="132.0" style="-fx-background-color: black; -fx-border-color: white; -fx-text-fill: lime;" text="Ok" AnchorPane.leftAnchor="20.0" />
       <Text fill="LIME" layoutX="20.0" layoutY="46.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Wprowadź adres servera:" AnchorPane.leftAnchor="20.0" />
       <Text fill="LIME" layoutX="20.0" layoutY="101.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Wprowadź port servera:" AnchorPane.leftAnchor="20.0" />

@@ -44,6 +44,13 @@ public class CanalWindowController {
 
     @FXML
     void okCanalButtonAction(ActionEvent event) {
+        
+         if (parentController.getConnection() != null) {
+            String message = this.textFieldCanal.getText();
+            parentController.getConnection().sendMessage("$join " + message);
+            this.textFieldCanal.clear();
+        }
+        
         Stage stage = (Stage) this.okCanalButton.getScene().getWindow();
         this.parentController.setKanalWindow(false);
         stage.close();

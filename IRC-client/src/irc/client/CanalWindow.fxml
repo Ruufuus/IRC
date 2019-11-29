@@ -5,11 +5,11 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="300.0" style="-fx-background-color: black;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="irc.client.CanalWindowController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="150.0" prefWidth="300.0" style="-fx-background-color: black;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="irc.client.CanalWindowController">
    <children>
-      <Button fx:id="okCanalButton" layoutX="20.0" layoutY="146.0" mnemonicParsing="false" onAction="#okCanalButtonAction" prefHeight="40.0" prefWidth="132.0" style="-fx-background-color: black; -fx-border-color: white; -fx-text-fill: lime;" text="Ok" />
-      <Button fx:id="anulujCanalButton" layoutX="213.0" layoutY="146.0" mnemonicParsing="false" onAction="#anulujCanalButtonAction" prefHeight="40.0" prefWidth="73.0" style="-fx-background-color: black; -fx-border-color: white; -fx-text-fill: lime;" text="Anuluj" />
-      <TextField fx:id="textFieldCanal" layoutX="20.0" layoutY="75.0" onAction="#textFieldCanalAction" style="-fx-background-color: black; -fx-border-color: white; -fx-text-fill: lime;" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" />
-      <Text fill="LIME" layoutX="20.0" layoutY="71.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Wprowadż nazwę kanału:" />
+      <Button fx:id="okCanalButton" layoutX="21.0" layoutY="96.0" mnemonicParsing="false" onAction="#okCanalButtonAction" prefHeight="40.0" prefWidth="132.0" style="-fx-background-color: black; -fx-border-color: white; -fx-text-fill: lime;" text="Ok" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="20.0" />
+      <Button fx:id="anulujCanalButton" layoutX="207.0" layoutY="96.0" mnemonicParsing="false" onAction="#anulujCanalButtonAction" prefHeight="40.0" prefWidth="73.0" style="-fx-background-color: black; -fx-border-color: white; -fx-text-fill: lime;" text="Anuluj" AnchorPane.bottomAnchor="14.0" AnchorPane.rightAnchor="20.0" />
+      <TextField fx:id="textFieldCanal" layoutX="20.0" layoutY="48.0" onAction="#textFieldCanalAction" style="-fx-background-color: black; -fx-border-color: white; -fx-text-fill: lime;" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" />
+      <Text fill="LIME" layoutX="20.0" layoutY="36.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Wprowadż nazwę kanału:" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="23.0" />
    </children>
 </AnchorPane>

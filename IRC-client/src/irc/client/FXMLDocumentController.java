@@ -93,20 +93,20 @@ public class FXMLDocumentController {
     void appendMessages(String message) {
         this.messageList.getItems().add(message);
     }
-    
+
     void commandHandling(String command) {
-        if(command.matches("\\$room_list .*")){
+        if (command.matches("\\$room_list .*")) {
             this.canalList.getItems().clear();
-            
-            for (String canal : Arrays.copyOfRange(command.split(" "), 1, command.split(" ").length) ) {
+
+            for (String canal : Arrays.copyOfRange(command.split(" "), 1, command.split(" ").length)) {
                 this.canalList.getItems().add(canal);
             }
         }
-        
-        if(command.matches("\\$user_list.*")){
+
+        if (command.matches("\\$user_list.*")) {
             this.userList.getItems().clear();
-            
-            for (String canal : Arrays.copyOfRange(command.split(" "), 1, command.split(" ").length) ) {
+
+            for (String canal : Arrays.copyOfRange(command.split(" "), 1, command.split(" ").length)) {
                 this.userList.getItems().add(canal);
             }
         }
@@ -166,6 +166,7 @@ public class FXMLDocumentController {
     @FXML
     void sendMessage(ActionEvent event) throws IOException {
         if (this.getConnection() != null) {
+            System.out.println(this.messField.getText());
             String message = this.messField.getText();
             this.getConnection().sendMessage(message);
             messField.clear();
@@ -192,14 +193,14 @@ public class FXMLDocumentController {
                         if (!empty && s.matches(".*@.*")) {
                             String color = s.split(" ")[1].split("@")[1];
                             s = s.replace("@" + color, ":");
-                            if(!color.matches("#[a-fA-F0-9]{6}")){
+                            if (!color.matches("#[a-fA-F0-9]{6}")) {
                                 color = "#ffffff";
                             }
                             setStyle("-fx-text-fill: " + color);
                             setText(s);
 
                         } else {
-                             setStyle("-fx-text-fill: #ffffff");
+                            setStyle("-fx-text-fill: #ffffff");
                             setText(s);
                         }
                     }
@@ -216,14 +217,14 @@ public class FXMLDocumentController {
                         if (!empty && s.matches(".*@.*")) {
                             String color = s.split("@")[1];
                             s = s.replace("@" + color, "");
-                            if(!color.matches("#[a-fA-F0-9]{6}")){
+                            if (!color.matches("#[a-fA-F0-9]{6}")) {
                                 color = "#ffffff";
                             }
                             setStyle("-fx-text-fill: " + color);
                             setText(s);
 
                         } else {
-                             setStyle("-fx-text-fill: #ffffff");
+                            setStyle("-fx-text-fill: #ffffff");
                             setText(s);
                         }
                     }
