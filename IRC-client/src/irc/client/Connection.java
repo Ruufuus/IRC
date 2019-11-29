@@ -77,7 +77,7 @@ public class Connection implements Runnable {
             try {
                 this.reader = new BufferedReader(new InputStreamReader(getClientSocket().getInputStream()));
             } catch (IOException ex) {
-                Logger.getLogger(Connection.class.getName()).log(Level.SEVERE, null, ex);
+                System.out.println("Odłączono od servera");
             }
             try {
                 String readerLine;
@@ -116,7 +116,7 @@ public class Connection implements Runnable {
     /**
      * @param isRunning the isRunning to set
      */
-    public void setRunning(boolean isRunning) throws IOException {
+    public void setRunning(boolean isRunning){
         this.setClientSocket(null);
         this.writer.close();
         this.running = isRunning;
