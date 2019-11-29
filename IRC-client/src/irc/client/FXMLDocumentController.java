@@ -191,8 +191,8 @@ public class FXMLDocumentController {
                         super.updateItem(s, empty);    //To change body of overridden methods use File | Settings | File Templates.
                         if (!empty && s.matches(".*@.*")) {
                             String color = s.split(" ")[1].split("@")[1];
+                            s = s.replace("@" + color, ":");
                             if(!color.matches("#[a-fA-F0-9]{6}")){
-                                s = s.replace(color, "#ffffff");
                                 color = "#ffffff";
                             }
                             setStyle("-fx-text-fill: " + color);
@@ -215,8 +215,8 @@ public class FXMLDocumentController {
                         super.updateItem(s, empty);    //To change body of overridden methods use File | Settings | File Templates.
                         if (!empty && s.matches(".*@.*")) {
                             String color = s.split("@")[1];
+                            s = s.replace("@" + color, "");
                             if(!color.matches("#[a-fA-F0-9]{6}")){
-                                s = s.replace(color, "#ffffff");
                                 color = "#ffffff";
                             }
                             setStyle("-fx-text-fill: " + color);
